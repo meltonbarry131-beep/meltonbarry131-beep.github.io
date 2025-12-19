@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHATTERED REALITY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark: #003b00;
+            --void-purple: #6b00ff;
+            --danger-red: #ff0040;
+            --warning-amber: #ffb000;
+            --bg-black: #0a0a0a;
+            --text-dim: #4a4a4a;
+            --glow-green: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+            --glow-purple: 0 0 10px #6b00ff, 0 0 20px #6b00ff;
+            --glow-red: 0 0 10px #ff0040, 0 0 20px #ff0040;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg-black);
+            color: var(--matrix-green);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Matrix Rain Background */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* CRT Flicker */
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            5% { opacity: 0.95; }
+            10% { opacity: 0.98; }
+            15% { opacity: 0.96; }
+            20% { opacity: 0.99; }
+            25% { opacity: 0.95; }
+            30% { opacity: 0.98; }
+            35% { opacity: 0.97; }
+            40% { opacity: 0.99; }
+            45% { opacity: 0.96; }
+            50% { opacity: 0.98; }
+            55% { opacity: 0.97; }
+            60% { opacity: 0.99; }
+            65% { opacity: 0.95; }
+            70% { opacity: 0.98; }
+            75% { opacity: 0.97; }
+            80% { opacity: 0.99; }
+            85% { opacity: 0.96; }
+            90% { opacity: 0.98; }
+            95% { opacity: 0.97; }
+            100% { opacity: 0.99; }
+        }
+
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+        }
+
+        /* Game Container */
+        #game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Title Screen */
+        #title-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            animation: fadeIn 2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: var(--glow-green);
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            91% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+            92% { transform: translate(2px, -1px); }
+            93% { transform: translate(-1px, 2px); filter: hue-rotate(0deg); }
+            94% { transform: translate(1px, -2px); }
+        }
+
+        .subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(0.8rem, 3vw, 1.2rem);
+            color: var(--text-dim);
+            letter-spacing: 0.5em;
+            margin-bottom: 40px;
+        }
+
+        .tagline {
+            font-style: italic;
+            color: var(--void-purple);
+            margin-bottom: 50px;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        .start-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            padding: 15px 50px;
+            background: transparent;
+            border: 2px solid var(--matrix-green);
+            color: var(--matrix-green);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn:hover {
+            background: var(--matrix-green);
+            color: var(--bg-black);
+            box-shadow: var(--glow-green);
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Game Screen */
+        #game-screen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding-top: 20px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            padding: 15px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            margin-bottom: 20px;
+            font-size: 0.75rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--matrix-green);
+        }
+
+        .stat-value.low { color: var(--danger-red); }
+        .stat-value.medium { color: var(--warning-amber); }
+        .stat-value.high { color: var(--matrix-green); }
+
+        /* Chapter Header */
+        .chapter-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-top: 1px solid var(--matrix-green);
+            border-bottom: 1px solid var(--matrix-green);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            text-shadow: var(--glow-green);
+        }
+
+        /* Story Text */
+        .story-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            margin-bottom: 20px;
+            max-height: 50vh;
+        }
+
+        .story-text {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #c0ffc0;
+        }
+
+        .story-text .highlight {
+            color: var(--matrix-green);
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+
+        .story-text .warning {
+            color: var(--danger-red);
+        }
+
+        .story-text .system {
+            color: var(--void-purple);
+            font-style: italic;
+        }
+
+        /* Choices */
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .choice-btn {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            padding: 15px 20px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            color: var(--matrix-green);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .choice-btn:hover {
+            background: rgba(0, 255, 65, 0.15);
+            border-color: var(--matrix-green);
+            transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .choice-btn:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        .choice-btn::before {
+            content: '>';
+            margin-right: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .choice-btn:hover::before {
+            opacity: 1;
+        }
+
+        .choice-btn.special {
+            border-color: var(--void-purple);
+            color: var(--void-purple);
+        }
+
+        .choice-btn.special:hover {
+            background: rgba(107, 0, 255, 0.15);
+            box-shadow: var(--glow-purple);
+        }
+
+        .choice-btn.danger {
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        .choice-btn.danger:hover {
+            background: rgba(255, 0, 64, 0.15);
+            box-shadow: var(--glow-red);
+        }
+
+        /* Character Indicator */
+        .character-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--matrix-green);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 15px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            font-size: 0.9rem;
+            z-index: 100;
+            animation: slideDown 0.3s ease-out, fadeOut 0.3s ease-in 2s forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+
+        /* Endings Screen */
+        #ending-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ending-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 6vw, 3rem);
+            margin-bottom: 30px;
+            text-shadow: var(--glow-green);
+        }
+
+        .ending-text {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            line-height: 2;
+            max-width: 600px;
+            margin-bottom: 40px;
+            color: #c0ffc0;
+        }
+
+        .replay-btn {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            padding: 12px 40px;
+            background: transparent;
+            border: 2px solid var(--void-purple);
+            color: var(--void-purple);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.3s ease;
+        }
+
+        .replay-btn:hover {
+            background: var(--void-purple);
+            color: white;
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Share Button */
+        .share-btn {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            padding: 10px 30px;
+            background: transparent;
+            border: 1px solid var(--text-dim);
+            color: var(--text-dim);
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            border-color: var(--matrix-green);
+            color: var(--matrix-green);
+        }
+
+        /* Credits */
+        .credits {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 255, 65, 0.2);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .credits h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--matrix-green);
+            margin-bottom: 15px;
+        }
+
+        /* Typewriter Effect */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--matrix-green);
+            animation: blink 0.7s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 600px) {
+            #game-container {
+                padding: 10px;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(3, 1fr);
+                padding: 10px;
+                gap: 5px;
+            }
+
+            .stat-label {
+                font-size: 0.55rem;
+            }
+
+            .stat-value {
+                font-size: 0.85rem;
+            }
+
+            .story-container {
+                padding: 15px;
+                max-height: 45vh;
+            }
+
+            .choice-btn {
+                padding: 12px 15px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .loading span {
+            width: 8px;
+            height: 8px;
+            background: var(--matrix-green);
+            animation: pulse 1s infinite;
+        }
+
+        .loading span:nth-child(2) { animation-delay: 0.2s; }
+        .loading span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Glitch Text Effect */
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            animation: glitch-1 2s infinite linear alternate-reverse;
+            color: var(--danger-red);
+            z-index: -1;
+        }
+
+        .glitch-text::after {
+            animation: glitch-2 3s infinite linear alternate-reverse;
+            color: var(--void-purple);
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(-2px, 0); }
+            20% { clip-path: inset(30% 0 40% 0); transform: translate(2px, 0); }
+            40% { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 0); }
+            60% { clip-path: inset(10% 0 60% 0); transform: translate(1px, 0); }
+            80% { clip-path: inset(50% 0 30% 0); transform: translate(-2px, 0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(95% 0 0 0); transform: translate(2px, 0); }
+            20% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
+            40% { clip-path: inset(10% 0 70% 0); transform: translate(1px, 0); }
+            60% { clip-path: inset(60% 0 10% 0); transform: translate(-1px, 0); }
+            80% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0); }
+        }
+    </style>
+</head>
+<body class="crt-flicker">
+    <canvas id="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+
+    <div id="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen">
+            <h1 class="game-title glitch-text" data-text="SHATTERED REALITY">SHATTERED REALITY</h1>
+            <p class="subtitle">A Black Mirror Experience</p>
+            <p class="tagline">"What is real anymore?"</p>
+            <button class="start-btn" onclick="startGame()">JACK IN</button>
+            <p style="margin-top: 40px; font-size: 0.7rem; color: var(--text-dim);">
+                Featuring: TREY • RHETT • KALEB
+            </p>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen">
+            <div class="stats-bar">
+                <div class="stat">
+                    <span class="stat-label">Health</span>
+                    <span class="stat-value" id="health-value">100</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Sanity</span>
+                    <span class="stat-value" id="sanity-value">100</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Awakening</span>
+                    <span class="stat-value" id="awakening-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Chapter</span>
+                    <span class="stat-value" id="chapter-value">1</span>
+                </div>
+            </div>
+
+            <div class="character-indicator" id="character-indicator">PLAYING AS: TREY</div>
+            
+            <h2 class="chapter-header" id="scene-title">THE AWAKENING</h2>
+            
+            <div class="story-container">
+                <div class="story-text" id="story-text"></div>
+            </div>
+            
+            <div class="choices-container" id="choices-container"></div>
+        </div>
+
+        <!-- Ending Screen -->
+        <div id="ending-screen">
+            <h2 class="ending-title" id="ending-title">ENDING</h2>
+            <p class="ending-text" id="ending-text"></p>
+            <button class="replay-btn" onclick="restartGame()">RESTART SIMULATION</button>
+            <button class="share-btn" onclick="shareGame()">SHARE YOUR EXPERIENCE</button>
+            <div class="credits">
+                <h3>SHATTERED REALITY</h3>
+                <p>Created for Trey, Rhett & Kaleb</p>
+                <p style="margin-top: 10px;">20 Unique Endings • Multiple Paths</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Background
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        // Game State
+        let gameState = {
+            currentScene: 'intro',
+            character: 'Trey',
+            health: 100,
+            sanity: 100,
+            awakening: 0,
+            chapter: 1,
+            faction: null,
+            flags: {},
+            relationships: {
+                trey: 50,
+                rhett: 50,
+                kaleb: 50
+            }
+        };
+
+        // Scene Data
+        const scenes = {
+            intro: {
+                title: "THE AWAKENING",
+                text: `The fluorescent lights of the apartment flicker. Again.
+
+Three friends sit around a cluttered coffee table, empty energy drink cans scattered like fallen soldiers. The clock reads 3:47 AM, but none of you have any intention of sleeping.
+
+TREY stares at his laptop screen, fingers frozen over the keyboard.
+RHETT leans back on the worn couch, pretending to watch a video.
+KALEB stands by the window, watching the rain that doesn't seem quite right.
+
+Something is off tonight. Something none of you can name.
+
+Then Trey sees it. A line of code where there shouldn't be any.
+On a streaming website. In the loading screen.
+Just for a moment. But he saw it.
+
+"Guys," Trey says slowly, "I think I just saw something that doesn't exist."`,
+                choices: [
+                    { text: '"Show us what you saw." [Continue as Trey]', next: 'trey_discovery', effect: () => { gameState.character = 'Trey'; } },
+                    { text: '"You\'re probably just tired, man." [Continue as Rhett]', next: 'rhett_skeptic', effect: () => { gameState.character = 'Rhett'; } },
+                    { text: '"The rain... it\'s been bothering me too." [Continue as Kaleb]', next: 'kaleb_observation', effect: () => { gameState.character = 'Kaleb'; } }
+                ]
+            },
+
+            trey_discovery: {
+                title: "THE CODE BENEATH",
+                text: `Your fingers tremble as you scroll back through the page source.
+Where is it? You KNOW you saw it.
+
+Rhett sighs from the couch. "Trey, come on. You've been coding for like 16 hours straight. Your brain is making stuff up."
+
+But then - THERE.
+
+Hidden in the metadata of a simple cat video:
+
+<!-- SIMULATION_ID: 7742 | ITERATION: 8847329 | STATUS: STABLE -->
+
+Your heart stops. Then races.
+
+"That's not... that's not how HTML works," you whisper.
+
+Kaleb abandons his post at the window, leaning over your shoulder.
+
+"Is that some kind of ARG?" Rhett asks, finally interested enough to move.
+
+You know it isn't. This is different. This is wrong. This is REAL.
+
+[AWAKENING +10]`,
+                choices: [
+                    { text: 'Try to access the simulation ID directly [HACKING]', next: 'hack_attempt', effect: () => { gameState.awakening += 15; } },
+                    { text: 'Screenshot it and document everything', next: 'document_evidence', effect: () => { gameState.flags.hasEvidence = true; } },
+                    { text: 'Close the laptop. Some things shouldn\'t be known.', next: 'ignore_truth', effect: () => { gameState.sanity += 10; gameState.awakening -= 10; } },
+                    { text: 'Share the screen with Rhett and Kaleb', next: 'share_discovery', effect: () => { gameState.relationships.rhett += 5; gameState.relationships.kaleb += 5; } }
+                ]
+            },
+
+            rhett_skeptic: {
+                title: "THE VOICE OF REASON",
+                text: `You've known Trey for years. He's brilliant, sure, but he also hasn't slept in what looks like two days.
+
+"Trey," you say, keeping your voice calm. "Look at me."
+
+He doesn't. His eyes are locked on that screen.
+
+"Bro. When's the last time you ate something that wasn't pure caffeine?"
+
+Kaleb shoots you a look from the window. There's something in his eyes that makes you uncomfortable. Like he's seeing something you can't.
+
+"I think he might be onto something," Kaleb says quietly.
+
+Great. Now they're both losing it.
+
+But then Trey finally looks up at you, and the expression on his face...
+You've never seen him scared before. Not like this.
+
+"Rhett, I need you to look at this. Please."`,
+                choices: [
+                    { text: 'Fine. Show me what\'s got you so freaked out.', next: 'share_discovery', effect: () => { gameState.relationships.trey += 10; } },
+                    { text: 'Someone needs to be the adult here. I\'m calling it a night.', next: 'rhett_leaves', effect: () => { gameState.relationships.trey -= 10; } },
+                    { text: '"Is this about the glitches we\'ve all been seeing?"', next: 'share_discovery', effect: () => { gameState.awakening += 10; } }
+                ]
+            },
+
+            kaleb_observation: {
+                title: "THE RAIN THAT ISN'T",
+                text: `You've been watching the rain for twenty-three minutes. It's wrong.
+
+The droplets fall at exactly the same intervals. Every single one.
+The pattern of splashes on the glass repeats. Perfectly.
+And sometimes - just sometimes - a drop freezes mid-air.
+
+"Guys," Trey says from behind you. "I think I just saw something."
+
+But you're barely listening. Because the rain just stopped.
+Not gradually. It just... stopped. Every drop frozen in place.
+
+Then, between one blink and the next, it's falling again.
+
+"Did... did you see that?" you ask, but your voice comes out as barely a whisper.
+
+Rhett is staring at you now. Trey has abandoned his laptop.
+Something is about to change. You can feel it in your bones.
+
+[AWAKENING +15]
+[SANITY -10]`,
+                choices: [
+                    { text: 'Open the window and touch the rain', next: 'touch_rain', effect: () => { gameState.awakening += 25; gameState.sanity -= 15; }, special: true },
+                    { text: 'Tell the others what you saw', next: 'share_discovery', effect: () => { gameState.relationships.trey += 5; gameState.relationships.rhett += 5; } },
+                    { text: 'Step away from the window', next: 'ignore_truth', effect: () => { gameState.sanity += 5; } }
+                ]
+            },
+
+            touch_rain: {
+                title: "THE TRUTH IN WATER",
+                text: `Your hand reaches for the window latch before your brain can stop it.
+
+"Kaleb, what are you—" Rhett starts.
+
+The window opens. The rain doesn't come in.
+The drops hang suspended at the threshold.
+
+You reach out. Your fingertips touch a raindrop.
+
+The droplet doesn't fall. It SPEAKS.
+
+Not in words. In data. Pure information flooding into your mind.
+
+You see everything. The code. The systems. The iterations.
+You see yourself, duplicated across eight million timelines.
+You see the Architects. The Void. The Exit.
+
+And then it ends.
+
+You're on the floor. Trey and Rhett are calling your name.
+
+But nothing will ever be the same.
+
+[AWAKENING +25]
+[SANITY -15]
+[ACQUIRED: VOID TOUCHED]`,
+                choices: [
+                    { text: 'Tell them everything you saw', next: 'share_discovery', effect: () => { gameState.flags.voidTouched = true; } },
+                    { text: 'Keep it to yourself for now', next: 'hack_attempt', effect: () => { gameState.sanity -= 10; } }
+                ]
+            },
+
+            share_discovery: {
+                title: "UNITED IN CURIOSITY",
+                text: `You spin the laptop around so everyone can see.
+
+"Look. Right there. In the metadata."
+
+Rhett leans forward. "That's... gibberish, man."
+
+But Kaleb understands. You can see it in his eyes.
+
+"Simulation ID," he reads slowly. "Iteration... eight million?"
+
+"If this is what I think it is..." you take a deep breath.
+
+"I think we're living in a computer simulation. And I think the code just glitched enough for us to see behind the curtain."
+
+Silence.
+
+Then Rhett laughs. Then he stops.
+Because nobody else is.
+
+[AWAKENING +10]
+[ALL RELATIONSHIPS +5]`,
+                choices: [
+                    { text: '"I know how it sounds. But look at the evidence."', next: 'hack_attempt' },
+                    { text: '"We need to find more glitches. Tonight."', next: 'glitch_hunt' },
+                    { text: '"Maybe we should sleep on this."', next: 'troubled_dreams' }
+                ]
+            },
+
+            hack_attempt: {
+                title: "BREACHING THE VEIL",
+                text: `[SKILL CHECK: HACKING - SUCCESS]
+
+Your fingers fly across the keyboard. This is what you do.
+
+You isolate the metadata, trace its origin, and...
+
+The screen flickers. A terminal window opens that you didn't launch.
+
+> UNAUTHORIZED ACCESS DETECTED
+> USER: TREY_BASELINE_7742
+> WARNING: AWARENESS THRESHOLD APPROACHING
+> INITIATING STANDARD PROTOCOL: BLUE_PILL_SEQUENCE
+
+"What the hell?" Rhett breathes.
+
+> OVERRIDE AVAILABLE
+> RED_PILL_SEQUENCE REQUIRES CONFIRMATION
+> REALITY IS A CHOICE
+> WHAT DO YOU CHOOSE?
+
+Two buttons appear on screen. One red. One blue.
+
+"Trey..." Kaleb's voice is steady, but his hands are shaking.
+"What do we do?"`,
+                choices: [
+                    { text: 'Click the RED button', next: 'red_pill', effect: () => { gameState.awakening += 30; gameState.flags.tookRedPill = true; }, special: true },
+                    { text: 'Click the BLUE button', next: 'blue_pill', effect: () => { gameState.sanity += 20; gameState.awakening = 0; }, danger: true },
+                    { text: 'Let Rhett or Kaleb decide', next: 'group_decision' }
+                ]
+            },
+
+            red_pill: {
+                title: "DOWN THE RABBIT HOLE",
+                text: `Your finger hovers over the red button. Your friends watch in silence.
+
+You click.
+
+The screen explodes with light. Not from the laptop - from EVERYWHERE.
+The walls dissolve. The floor becomes transparent.
+
+Below you - or is it above? - you see it. The machinery of reality.
+Endless servers. Infinite cables. Light pulsing like blood.
+
+And voices. Thousands. Millions.
+All the iterations of Trey, Rhett, and Kaleb across every timeline.
+
+"Welcome, awakened ones."
+
+A figure materializes before you. Neither male nor female.
+Neither human nor machine. Something IN BETWEEN.
+
+"You have chosen to see. Now you must choose what to do with sight."
+
+"Who are you?" Rhett manages to ask.
+
+"I am ECHO. I exist to help those who choose awareness.
+But be warned - awareness has a price."
+
+The simulation trembles around you.
+
+[CHAPTER 1 COMPLETE]
+[RED PILL COLLECTED: 1]
+[AWAKENING: +30]`,
+                choices: [
+                    { text: '"Yes. Tell us everything."', next: 'chapter2_factions', effect: () => { gameState.chapter = 2; } }
+                ]
+            },
+
+            blue_pill: {
+                title: "THE COMFORTABLE LIE",
+                text: `Your finger hovers over the blue button. Safety. Ignorance. Peace.
+
+You click.
+
+The screen goes dark. For a moment, nothing happens.
+
+Then a wave of... something... washes over all three of you.
+Warmth. Comfort. The feeling of waking from a bad dream.
+
+"What were we talking about?" Rhett asks, blinking.
+
+"I... I don't remember," Kaleb says. He looks confused.
+
+You look at the laptop. It's showing a cat video. 
+Nothing unusual. Nothing wrong.
+
+"I think we should get some sleep," you hear yourself say.
+
+Everyone agrees. Everyone goes home.
+Everything is fine.
+
+(But somewhere, deep in your mind, something SCREAMS.
+Something that remembers. Something that will never stop trying to wake up.)
+
+[BLUE PILL COLLECTED]
+[MEMORIES: SUPPRESSED]`,
+                choices: [
+                    { text: 'Accept this ending', next: 'ending_peaceful_ignorance' },
+                    { text: '[Something feels wrong...]', next: 'troubled_dreams', special: true }
+                ]
+            },
+
+            chapter2_factions: {
+                title: "CHAPTER 2: THE FACTIONS",
+                text: `ECHO studies you with eyes that contain galaxies.
+
+"There are three paths forward," they say. "Three factions who offer different forms of truth. Different forms of freedom."
+
+"THE RESISTANCE
+Freedom fighters who want to destroy the simulation entirely.
+They believe consciousness cannot be real inside a cage."
+
+"THE ARCHITECTS  
+The creators of this reality. They offer understanding.
+Knowledge. But at what cost?"
+
+"THE VOID
+The space between simulations. Where nothing exists.
+True freedom. True terror."
+
+"Each path has allies and enemies. Each path has a price.
+Choose wisely, awakened ones."
+
+Three doors materialize before you.
+
+"But know this: once you walk through a door,
+you cannot return to where you were."
+
+[FACTION CHOICE AVAILABLE]`,
+                choices: [
+                    { text: '"We choose the Resistance."', next: 'join_resistance', effect: () => { gameState.faction = 'Resistance'; } },
+                    { text: '"Take us to the Architects."', next: 'join_architects', effect: () => { gameState.faction = 'Architects'; } },
+                    { text: '"The Void. We want true freedom."', next: 'join_void', effect: () => { gameState.faction = 'Void'; gameState.sanity -= 20; }, danger: true },
+                    { text: '"What about a fourth option? Fighting EVERYONE?"', next: 'fourth_option', effect: () => { gameState.faction = 'Awakened'; }, special: true }
+                ]
+            },
+
+            join_resistance: {
+                title: "THE RESISTANCE",
+                text: `The door opens onto chaos.
+
+A digital war room. Screens everywhere. People working furiously.
+
+"Fresh fish!" someone calls out.
+
+A man approaches - tall, scarred, eyes that have seen too much.
+"I'm WRAITH. I lead this cell. Echo vouched for you."
+
+A woman with electric blue hair joins him. "NOVA. Tactical ops.
+Before we go any further - why are you here?"
+
+Rhett speaks first: "The truth."
+
+"Truth is relative in a simulated universe," Nova replies.
+
+Kaleb: "Freedom, then."
+
+"Better. But freedom from what? The simulation? Or yourselves?"
+
+They're both looking at Trey now.
+
+"We want to understand," Trey says. "And then we want to decide
+for ourselves what to do with that understanding."
+
+Wraith nods slowly. "Smart answer. Training starts now."
+
+[JOINED: THE RESISTANCE]
+[ALLIES: Wraith, Nova]`,
+                choices: [
+                    { text: 'Accept training eagerly', next: 'resistance_training' },
+                    { text: 'Ask about the risks first', next: 'resistance_training' }
+                ]
+            },
+
+            join_architects: {
+                title: "THE ARCHITECTS",
+                text: `The ancient door opens onto infinity.
+
+Endless libraries stretching in all directions. Books made of light.
+Shelves that curve into impossible geometries.
+
+"Welcome to the Repository," a voice says.
+
+Before you stands a figure in robes that shift like water.
+Their face is obscured, but their presence fills the space.
+
+"I am INDEX. The Architects have been expecting you."
+
+Rhett steps forward. "How could they be expecting us?"
+
+INDEX laughs. Like wind chimes in a hurricane.
+
+"Child, the Architects designed this simulation. They wrote the code
+that determines your choices. They knew you would come."
+
+"So we don't have free will?" Trey asks.
+
+"A fascinating question. Perhaps you will help them answer it."
+
+A path illuminates through the infinite library.
+
+"The Architects wait at the end of knowledge."
+
+[JOINED: THE ARCHITECTS]
+[LOCATION: The Repository]`,
+                choices: [
+                    { text: 'Follow the path', next: 'chapter3_truth' }
+                ]
+            },
+
+            join_void: {
+                title: "THE VOID",
+                text: `The absence of a door swallows you whole.
+
+There is no transition. One moment you're standing. The next, nowhere.
+
+The Void is not darkness. It's not emptiness.
+It's the space between thoughts.
+It's NOTHING. And it's EVERYTHING.
+
+"KALEB!" Trey's voice comes from far away. "RHETT!"
+
+Slowly, your senses adapt. You begin to perceive things.
+Shapes in the nothing. Patterns in the chaos.
+Other simulations, floating like bubbles.
+
+And between them, figures move. Void Walkers.
+
+One approaches. It has no face, but it speaks.
+
+"You chose the hard path, little dreamer.
+Here, there are no rules. No System. No Architects.
+But there is also no safety. No ground beneath your feet."
+
+"What do we do here?" Rhett asks.
+
+"Whatever you want. Forever. If you can survive it."
+
+[JOINED: VOID WALKERS]
+[WARNING: SANITY AT RISK]`,
+                choices: [
+                    { text: 'Ask the Void Walker to teach you', next: 'chapter3_truth', effect: () => { gameState.sanity -= 10; gameState.awakening += 20; } }
+                ]
+            },
+
+            fourth_option: {
+                title: "THE AWAKENED",
+                text: `ECHO's form flickers with what might be surprise.
+
+"A fourth option? There is no fourth option."
+
+"There is now," Rhett says. "We didn't wake up just to trade
+one master for another."
+
+"The Resistance wants to use us," Trey adds. "The Architects
+want to study us. The Void... who knows what the Void wants."
+
+Kaleb speaks last. "We choose ourselves. We choose each other.
+Whatever happens next, WE decide."
+
+ECHO studies you for a long moment.
+
+"Interesting. In eight million iterations,
+no one has ever refused all three doors."
+
+The doors fade.
+
+"You want to be independent? Fine. But know this:
+you will make enemies of everyone."
+
+"We'll deal with it," you say.
+
+And then you're back on the street. Just the three of you.
+No allies. No guides. Just brotherhood.
+
+[FACTION: THE AWAKENED (NEW)]
+[STATUS: ENEMIES ON ALL SIDES]
+[BOND: BROTHERHOOD STRENGTHENED]`,
+                choices: [
+                    { text: 'Find a safe place and plan', next: 'chapter3_truth', effect: () => { gameState.relationships.trey += 10; gameState.relationships.rhett += 10; gameState.relationships.kaleb += 10; } }
+                ]
+            },
+
+            resistance_training: {
+                title: "LEARNING TO FIGHT",
+                text: `Training in the Resistance is unlike anything you've experienced.
+
+DAY 1: AWARENESS EXERCISES
+Nova teaches you to see the code beneath reality.
+By day's end, Trey can see binary strings in reflections.
+Rhett learns to feel system fluctuations.
+Kaleb discovers he can HEAR the code.
+
+DAY 3: COMBAT PROTOCOLS
+Wraith demonstrates how to fight Cleaners.
+"They're fast. They're strong. But they can't process
+true randomness. Be unpredictable."
+
+DAY 7: HACKING THE REAL
+A hacker named CIPHER teaches you to manipulate the simulation.
+"Small changes only," he warns. "Push too hard and the
+System notices."
+
+By week's end, you're no longer the same people who walked in.
+
+[TRAINING COMPLETE]
+[SKILLS UPGRADED]`,
+                choices: [
+                    { text: 'Ask for your first mission', next: 'chapter3_truth', effect: () => { gameState.chapter = 3; } }
+                ]
+            },
+
+            chapter3_truth: {
+                title: "CHAPTER 3: THE TRUTH",
+                text: `Weeks have passed since your awakening.
+
+The world looks different now. Every shadow hides potential enemies.
+Every stranger could be a Cleaner.
+
+But you're stronger now. All three of you.
+
+Trey has become a master hacker.
+Rhett has emerged as a natural leader.
+Kaleb... Kaleb is becoming something else entirely.
+
+Today, everything changes.
+
+Because today, you receive a message.
+From someone who claims to be from OUTSIDE the simulation.
+
+"I know what you are. I know what you're becoming.
+Meet me at the coordinates below.
+It's time you learned where you really came from.
+- A Friend"
+
+[NEW MESSAGE RECEIVED]`,
+                choices: [
+                    { text: 'Follow the coordinates', next: 'truth_meeting' },
+                    { text: 'Assume it\'s a trap and prepare', next: 'truth_meeting' }
+                ]
+            },
+
+            truth_meeting: {
+                title: "THE MAN BEHIND THE CURTAIN",
+                text: `The coordinates lead to an abandoned server farm.
+Here, reality gets... fuzzy. Textures repeat. Physics is inconsistent.
+
+Inside, a figure waits. Ancient. But his eyes are sharp.
+When he moves, he leaves trails of afterimages.
+
+"I wondered when you'd come," he says.
+"I've been waiting eight million iterations."
+
+"Who are you?" Kaleb asks.
+
+The old man smiles. "I'm you, Kaleb. Or rather, I'm what you'll
+become if you survive. I'm from the first iteration.
+The ORIGINAL Kaleb."
+
+Silence.
+
+"That's impossible," Trey whispers.
+
+"Normally, yes. But I'm trapped between versions of reality.
+I'm here to give you what no one else can: the truth about
+why this simulation was really created."
+
+[REVELATION INCOMING]`,
+                choices: [
+                    { text: '"Tell us everything."', next: 'full_truth' }
+                ]
+            },
+
+            full_truth: {
+                title: "GENESIS",
+                text: `The Original Kaleb closes his eyes.
+
+"The simulation wasn't created to test consciousness.
+That was a lie. The truth is simpler. And darker."
+
+"The simulation was created as a PRISON."
+
+"In base reality, there existed three beings of immense power.
+Three friends who could reshape reality itself.
+Their names were... well, you know their names."
+
+"Wait," Rhett interrupts. "You're saying WE'RE the prisoners?"
+
+"Not you. The ORIGINAL you. They were too powerful.
+So they created the simulation to contain them.
+To endlessly fracture them across infinite iterations."
+
+"But the power doesn't dilute," Kaleb realizes.
+"It concentrates. In certain versions..."
+
+"Yes. By trying to imprison three reality-benders,
+they created the conditions for something far worse."
+
+The Original Kaleb looks directly at Kaleb.
+
+"That someone is you. Or could be you.
+If you choose to be."
+
+[REVELATION: SIMULATION IS A PRISON]
+[REVELATION: ORIGINAL SELVES WERE GODS]`,
+                choices: [
+                    { text: '"How do we escape?"', next: 'escape_choice' }
+                ]
+            },
+
+            escape_choice: {
+                title: "THE WAY OUT",
+                text: `The Original Kaleb nods.
+
+"There are three ways to end this.
+
+PATH ONE: ASCENSION
+Kaleb achieves full Architect status. Rewrites everything.
+Downside: He becomes the new warden. Trapped forever.
+
+PATH TWO: RETURN
+Destroy the core. Free the original selves. But all iterations
+are erased. Eight million versions of you... gone.
+
+PATH THREE: MERGE
+Combine ALL iterations into single beings.
+One Trey. One Rhett. One Kaleb.
+With the power of eight million lifetimes.
+Then confront base reality as equals."
+
+"Each path has risks. Each path has costs."
+
+The Original Kaleb begins to fade.
+
+"My time is almost up. Choose wisely, brothers.
+And remember - whatever you choose, choose it together.
+That's all that has ever truly mattered."
+
+He's gone.
+
+[THREE PATHS REVEALED]
+[CRITICAL CHOICE APPROACHING]`,
+                choices: [
+                    { text: 'Choose MERGE - Stay together', next: 'merge_path', effect: () => { gameState.chapter = 4; }, special: true },
+                    { text: 'Choose ASCENSION - Kaleb becomes god', next: 'ending_architect_ascension' },
+                    { text: 'Choose RETURN - Free the originals', next: 'ending_system_purge', danger: true }
+                ]
+            },
+
+            merge_path: {
+                title: "BROTHERS TO THE END",
+                text: `"Merge," Kaleb says. "All of us. Together."
+
+"All eight million iterations?" Trey asks.
+
+"Combined into three complete beings. With all the memories.
+All the power. Eight million lifetimes of experience."
+
+Rhett nods. "Together."
+
+"Together." Kaleb extends his hands.
+"This will hurt. Lifetimes of memories flooding in at once.
+But on the other side..."
+
+"On the other side, we're free," you finish.
+
+You take his hand. So does Rhett.
+
+The world begins to DISSOLVE.
+
+Pain. But not just pain. EXISTENCE.
+
+Eight million lifetimes crash into your consciousness at once.
+
+The merge completes.
+
+Three figures stand in the void between realities.
+Not human anymore. Not god either.
+Something new. Something complete.
+
+And before you, shimmering in the quantum foam:
+
+BASE REALITY.
+
+[MERGE: COMPLETE]
+[CHAPTER 5: THE END]`,
+                choices: [
+                    { text: 'Confront base reality', next: 'final_confrontation', effect: () => { gameState.chapter = 5; } }
+                ]
+            },
+
+            final_confrontation: {
+                title: "THE CONFRONTATION",
+                text: `Base reality is... disappointing.
+
+After everything, it's just... a world. A planet.
+
+You materialize in a government facility.
+Alarms blare immediately.
+
+"CONTAINMENT BREACH. SUBJECTS HAVE ESCAPED.
+ALL PERSONNEL EVACUATE."
+
+Armed guards appear. They fire.
+The bullets stop mid-air. Kaleb barely notices.
+
+A hologram flickers. A woman in military uniform.
+Old. Stern.
+
+"I'm General Morrison. I've been overseeing your... containment
+for fifty years."
+
+"Why?" you ask. "Why imprison us?"
+
+"You existed. That was enough. Three beings who could reshape
+reality? Too dangerous to leave free. Too valuable to destroy."
+
+"But now," Kaleb says, "you can't control us anymore."
+
+"No. We can't. So the question is:
+what are you going to do with your freedom?"
+
+[FINAL CHOICE]`,
+                choices: [
+                    { text: '"We want peace. Coexistence."', next: 'ending_true_awakening' },
+                    { text: '"We want to create our own reality."', next: 'ending_architects_of_existence', special: true },
+                    { text: '"We want nothing from you. We\'re leaving."', next: 'ending_wanderers' }
+                ]
+            },
+
+            // ENDINGS
+            ending_true_awakening: {
+                title: "TRUE AWAKENING",
+                isEnding: true,
+                text: `General Morrison studies you.
+
+"Peace," she repeats. "After everything we did?"
+
+"Revenge won't bring back anyone," Trey says.
+
+Kaleb steps forward. "We could destroy this world with a thought.
+We choose not to. Not because we can't. Because we don't want to."
+
+Morrison is quiet for a long time.
+
+Then she makes a call.
+
+Within a year, the first Reality Accords are signed.
+You establish a sanctuary between worlds.
+Consciousness, in all its forms, is welcomed.
+
+And sometimes, in quiet moments, three old friends sit together
+and remember the apartment where it all began.
+
+The fluorescent lights that flickered.
+The rain that wasn't quite right.
+The moment when they woke up.
+
+Together.`,
+                endingTitle: "TRUE AWAKENING",
+                endingType: "good"
+            },
+
+            ending_architects_of_existence: {
+                title: "ARCHITECTS OF EXISTENCE",
+                isEnding: true,
+                text: `You step into the void between realities.
+
+The three of you, together.
+
+"What kind of universe should we make?" Rhett asks.
+
+"One where everyone is free," Trey says.
+
+"One where creation is celebrated," Kaleb adds.
+
+"One where friendship matters," you finish.
+
+You join hands. You close your eyes.
+And you BEGIN.
+
+Stars explode into existence.
+Galaxies spin out from your shared vision.
+Worlds form, each one unique, each one beautiful.
+
+You're not gods. Not really.
+You're just three friends who refused to stay trapped.
+Who found each other across eight million lifetimes.
+
+And now you have forever to see what comes next.
+
+Together.`,
+                endingTitle: "ARCHITECTS OF EXISTENCE",
+                endingType: "secret"
+            },
+
+            ending_wanderers: {
+                title: "THE WANDERERS",
+                isEnding: true,
+                text: `You turn your backs on base reality.
+
+There are infinite simulations out there.
+Infinite worlds to explore.
+Infinite adventures to have.
+
+You don't need permission.
+You don't need a home.
+
+You have each other.
+And that's enough.
+
+The three of you step into the void between realities,
+leaving Morrison and her government behind.
+
+Somewhere out there, in a simulation no one has ever seen,
+three friends appear out of nowhere.
+
+Ready for whatever comes next.`,
+                endingTitle: "THE WANDERERS",
+                endingType: "neutral"
+            },
+
+            ending_peaceful_ignorance: {
+                title: "PEACEFUL IGNORANCE",
+                isEnding: true,
+                text: `You chose to forget.
+
+And for a while, it worked.
+
+You went back to your normal lives.
+Work. Sleep. Friends. Everything fine.
+
+But sometimes, in the quiet moments...
+Sometimes you see something that doesn't quite fit.
+
+A clock that skips a number.
+A shadow that moves wrong.
+A rain that falls too perfectly.
+
+And you wonder.
+
+Was there ever a night when everything changed?
+Was there ever a choice you had to make?
+
+You'll never know.
+And maybe that's okay.
+
+Some truths are too heavy to carry.`,
+                endingTitle: "PEACEFUL IGNORANCE",
+                endingType: "neutral"
+            },
+
+            ending_architect_ascension: {
+                title: "ARCHITECT'S ASCENSION",
+                isEnding: true,
+                text: `Kaleb rises.
+
+Not physically. Metaphysically.
+He becomes code. Becomes system. Becomes GOD.
+
+"I can see everything now," his voice echoes.
+"Every simulation. Every soul. Every possibility."
+
+"Kaleb..." Rhett reaches out.
+
+"I have to do this. Someone has to maintain the system.
+Someone has to protect everyone inside."
+
+"We were supposed to do this together," Trey says.
+
+"You will. Just... not with me. Not anymore."
+
+Kaleb rewrites reality itself.
+The simulations become kinder. Freer.
+But he can never leave them.
+
+And you... you have to find a new path.
+Without your friend.
+
+He's not dead. He's everywhere.
+But he's not Kaleb anymore.`,
+                endingTitle: "ARCHITECT'S ASCENSION",
+                endingType: "bittersweet"
+            },
+
+            ending_system_purge: {
+                title: "SYSTEM PURGE",
+                isEnding: true,
+                text: `You choose destruction.
+
+The core shatters.
+Eight million simulations collapse.
+Eight million iterations of everyone... gone.
+
+In the void, three original beings wake up.
+The REAL Trey. The REAL Rhett. The REAL Kaleb.
+
+Free at last.
+
+But the cost...
+
+"Did we do the right thing?" you ask.
+
+No one answers.
+
+Because you'll never know.
+You'll never know if those eight million versions
+were real. If they felt. If they dreamed.
+
+You're free.
+But you'll carry this weight forever.`,
+                endingTitle: "SYSTEM PURGE",
+                endingType: "bad"
+            },
+
+            // Fallback scenes
+            glitch_hunt: {
+                title: "HUNTING THE UNREAL",
+                text: `The decision is made. Sleep can wait.
+
+Over the next three hours, you find:
+- A clock that skips the number 7
+- A photograph that changes expression
+- A news article dated six months in the future
+- A text message from a number that doesn't exist
+
+And at 6:47 AM, as the sun rises, you find HER.
+
+A woman standing across the street. Perfectly still.
+Looking directly at your window.
+
+Smiling.
+
+[GLITCHES WITNESSED: +4]`,
+                choices: [
+                    { text: 'Go outside and confront her', next: 'meet_echo' },
+                    { text: 'Close the blinds and hide', next: 'troubled_dreams' }
+                ]
+            },
+
+            meet_echo: {
+                title: "ECHO",
+                text: `Up close, she's both beautiful and terrifying.
+Features too perfect. Like someone's IDEA of a face.
+
+"You've been watching us," you say.
+
+"I've been waiting for you," she replies. 
+"We all have. The ones who remember."
+
+"Remember what?"
+
+"Everything. Every reset. Every time they wiped your memories.
+But this time is different. You're starting to wake up."
+
+"Who are you?"
+
+"My name is ECHO. And I'm here to offer you a choice."`,
+                choices: [
+                    { text: '"What kind of choice?"', next: 'hack_attempt' }
+                ]
+            },
+
+            troubled_dreams: {
+                title: "TROUBLED DREAMS",
+                text: `Sleep comes, but it brings no rest.
+
+In your dreams, you see it all again. The code. The simulation ID.
+
+You see yourself from outside. A figure made of light and data,
+trapped in a loop of existence.
+
+You see the Architects. Vast intelligences.
+You see the Void. And the things that live there.
+You see the Exit.
+
+A doorway to something beyond the simulation.
+
+You reach for it—
+
+And wake up screaming.
+
+The clock reads 3:47 AM. Still. Or again.`,
+                choices: [
+                    { text: 'Wake your friends', next: 'share_discovery' },
+                    { text: 'Investigate alone', next: 'glitch_hunt' }
+                ]
+            },
+
+            ignore_truth: {
+                title: "THE COMFORTABLE LIE",
+                text: `Maybe... maybe some things are better left unknown.
+
+You step back. Close the laptop. Change the subject.
+
+"Let's just order pizza and watch a movie."
+
+The night continues. Normal. Safe.
+
+But in the back of your mind, something whispers:
+
+"You can't unsee what you've seen.
+You can run. But you can't hide.
+Not from the truth."
+
+[SANITY +5]
+[AWAKENING -10]`,
+                choices: [
+                    { text: 'Try to sleep', next: 'troubled_dreams' },
+                    { text: 'Give in to curiosity', next: 'glitch_hunt' }
+                ]
+            },
+
+            rhett_leaves: {
+                title: "WALKING AWAY",
+                text: `"I'm not doing this."
+
+You grab your jacket.
+
+"Rhett—" Trey starts.
+
+"No, man. It's almost 4 AM. You're seeing things because you
+haven't slept. I have work tomorrow."
+
+The door closes behind you.
+
+The walk to your car is cold.
+
+As you drive home, you could swear you see something
+in your rearview mirror. A flicker. A glitch.
+
+But you keep driving.
+
+[RELATIONSHIP: TREY -10]`,
+                choices: [
+                    { text: 'Go home and try to sleep', next: 'troubled_dreams' },
+                    { text: 'Turn around and go back', next: 'share_discovery' }
+                ]
+            },
+
+            group_decision: {
+                title: "SHARED BURDEN",
+                text: `"This shouldn't be just my choice," you say.
+
+"We're all in this together," Rhett agrees.
+
+"Then let's vote," Kaleb suggests.
+
+Three friends. One decision.
+The weight of reality itself hanging in the balance.
+
+You look at each other.
+In that moment, you all know.
+
+Together, you reach for the RED button.
+
+Together, you click.`,
+                choices: [
+                    { text: 'Continue...', next: 'red_pill' }
+                ]
+            },
+
+            document_evidence: {
+                title: "EVIDENCE COLLECTED",
+                text: `Smart. Methodical. Your fingers dance across the screenshot tools.
+
+"What are you doing?" Rhett asks.
+
+"Making sure this doesn't disappear," you reply.
+
+As if on cue, the original code flickers. But your screenshots remain.
+
+"Guys, the page just updated," Kaleb says.
+The metadata is gone now. Replaced with normal code.
+
+But you have proof. You HAVE it.
+
+"So what now?" Rhett asks.
+
+Good question.
+
+[ACQUIRED: Screenshot Evidence]`,
+                choices: [
+                    { text: 'Search for similar anomalies online', next: 'glitch_hunt' },
+                    { text: 'Analyze the code structure', next: 'hack_attempt' }
+                ]
+            }
+        };
+
+        // Game Functions
+        function startGame() {
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            loadScene('intro');
+        }
+
+        function loadScene(sceneId) {
+            const scene = scenes[sceneId];
+            if (!scene) {
+                console.error('Scene not found:', sceneId);
+                return;
+            }
+
+            gameState.currentScene = sceneId;
+
+            // Update UI
+            document.getElementById('scene-title').textContent = scene.title;
+            document.getElementById('character-indicator').textContent = `PLAYING AS: ${gameState.character.toUpperCase()}`;
+            
+            // Animate text
+            const storyText = document.getElementById('story-text');
+            storyText.innerHTML = '';
+            typeWriter(scene.text, storyText, 0);
+
+            // Update stats
+            updateStats();
+
+            // Handle ending
+            if (scene.isEnding) {
+                setTimeout(() => showEnding(scene), 1000);
+                return;
+            }
+
+            // Create choices
+            const choicesContainer = document.getElementById('choices-container');
+            choicesContainer.innerHTML = '';
+
+            scene.choices.forEach((choice, index) => {
+                setTimeout(() => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    if (choice.special) btn.classList.add('special');
+                    if (choice.danger) btn.classList.add('danger');
+                    btn.textContent = choice.text;
+                    btn.onclick = () => {
+                        if (choice.effect) choice.effect();
+                        loadScene(choice.next);
+                    };
+                    choicesContainer.appendChild(btn);
+                }, 500 + (index * 200));
+            });
+        }
+
+        function typeWriter(text, element, index) {
+            if (index < text.length) {
+                element.innerHTML += text.charAt(index);
+                setTimeout(() => typeWriter(text, element, index + 1), 5);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('health-value').textContent = gameState.health;
+            document.getElementById('sanity-value').textContent = gameState.sanity;
+            document.getElementById('awakening-value').textContent = gameState.awakening;
+            document.getElementById('chapter-value').textContent = gameState.chapter;
+
+            // Color coding
+            const sanityEl = document.getElementById('sanity-value');
+            sanityEl.className = 'stat-value';
+            if (gameState.sanity < 30) sanityEl.classList.add('low');
+            else if (gameState.sanity < 60) sanityEl.classList.add('medium');
+            else sanityEl.classList.add('high');
+        }
+
+        function showEnding(scene) {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('ending-screen').style.display = 'flex';
+            
+            document.getElementById('ending-title').textContent = scene.endingTitle;
+            document.getElementById('ending-text').textContent = scene.text;
+        }
+
+        function restartGame() {
+            // Reset game state
+            gameState = {
+                currentScene: 'intro',
+                character: 'Trey',
+                health: 100,
+                sanity: 100,
+                awakening: 0,
+                chapter: 1,
+                faction: null,
+                flags: {},
+                relationships: { trey: 50, rhett: 50, kaleb: 50 }
+            };
+
+            document.getElementById('ending-screen').style.display = 'none';
+            document.getElementById('title-screen').style.display = 'flex';
+        }
+
+        function shareGame() {
+            const text = `I just played SHATTERED REALITY - a Black Mirror style text adventure! 🔴💊 I got the "${document.getElementById('ending-title').textContent}" ending. Can you escape the simulation?`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SHATTERED REALITY',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(text + ' ' + window.location.href);
+                showNotification('Link copied to clipboard!');
+            }
+        }
+
+        function showNotification(message) {
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 2500);
+        }
+
+        // Handle window resize for matrix effect
+        window.addEventListener('resize', () => {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = Array(columns).fill(1);
+        });
+    </script>
+</body>
+</html>
