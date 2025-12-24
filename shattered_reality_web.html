@@ -576,7 +576,13 @@
             <p class="subtitle">A Black Mirror Experience</p>
             <p class="tagline">"What is real anymore?"</p>
             <button class="start-btn" onclick="startGame()">JACK IN</button>
-            <p style="margin-top: 40px; font-size: 0.7rem; color: var(--text-dim);">
+            <p style="margin-top: 20px; font-size: 0.65rem; color: var(--void-purple); letter-spacing: 0.1em;">
+                ⚠ Every playthrough begins differently ⚠
+            </p>
+            <p style="margin-top: 10px; font-size: 0.6rem; color: var(--text-dim);">
+                9 Starting Scenarios • 12 Modifiers • Random Events
+            </p>
+            <p style="margin-top: 20px; font-size: 0.7rem; color: var(--text-dim);">
                 Featuring: TREY • RHETT • KALEB
             </p>
         </div>
@@ -622,7 +628,8 @@
             <div class="credits">
                 <h3>SHATTERED REALITY</h3>
                 <p>Created for Trey, Rhett & Kaleb</p>
-                <p style="margin-top: 10px;">20 Unique Endings • Multiple Paths</p>
+                <p style="margin-top: 10px;">12 Unique Endings • 9 Starting Scenarios • 60+ Scenes</p>
+                <p style="margin-top: 5px; font-size: 0.7rem; color: var(--void-purple);">Every playthrough is unpredictable</p>
             </div>
         </div>
     </div>
@@ -639,7 +646,7 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()シスレヨマキウ';
         const fontSize = 14;
         let columns = Math.floor(canvas.width / fontSize);
         let drops = Array(columns).fill(1);
@@ -661,6 +668,105 @@
         }
         setInterval(drawMatrix, 50);
 
+        // ========================================
+        // RANDOMIZATION & UNPREDICTABILITY SYSTEM
+        // ========================================
+
+        // Possible starting scenarios - one will be chosen randomly
+        const startingScenarios = [
+            'intro',           // Original apartment scene
+            'glitch_storm',    // Reality fragmenting around them
+            'lucid_dream',     // Wake up inside a shared dream
+            'deja_vu_loop',    // Stuck repeating the same moment
+            'mirror_anomaly',  // Reflections acting independently
+            'time_skip',       // Missing 6 hours of memory
+            'stranger_warning', // Mysterious figure delivers a cryptic message
+            'digital_bleed',   // Their phones/devices start showing impossible things
+            'parallel_glimpse' // Briefly swap with alternate universe selves
+        ];
+
+        // Random modifiers that affect starting stats
+        const startingModifiers = [
+            { name: 'Insomniac', sanity: -15, awakening: +10, desc: 'You haven\'t slept in 72 hours. The edges of reality are already blurring.' },
+            { name: 'Paranoid', sanity: -10, awakening: +15, desc: 'You\'ve always felt watched. Now you know why.' },
+            { name: 'Skeptic', sanity: +20, awakening: -10, desc: 'There\'s always a rational explanation. Always.' },
+            { name: 'Sensitive', sanity: -5, awakening: +20, desc: 'You\'ve seen things others can\'t. Since childhood.' },
+            { name: 'Grounded', sanity: +15, health: +10, desc: 'Solid. Reliable. Reality has always made sense to you.' },
+            { name: 'Curious', awakening: +5, desc: 'You can\'t resist a mystery.' },
+            { name: 'Haunted', sanity: -20, awakening: +25, desc: 'Something has been following you for years.' },
+            { name: 'Lucky', health: +15, desc: 'Things just tend to work out for you.' },
+            { name: 'Unlucky', health: -15, sanity: -5, desc: 'Murphy\'s law is your biography.' },
+            { name: 'Connected', desc: 'You know people. Useful people.' },
+            { name: 'Isolated', sanity: -10, desc: 'It\'s just the three of you against the world.' },
+            { name: 'Tech Savvy', awakening: +10, desc: 'Computers speak to you in ways others don\'t understand.' }
+        ];
+
+        // Random events that can trigger during gameplay
+        const randomEvents = [
+            { id: 'glitch_flash', text: '\n\n[REALITY GLITCH: Your vision tears for a moment. Through the crack, you see code.]', sanity: -5, awakening: +5 },
+            { id: 'deja_vu', text: '\n\n[ANOMALY: This has happened before. Exactly like this. You\'re sure of it.]', awakening: +3 },
+            { id: 'time_skip', text: '\n\n[TIME ANOMALY: You blink. An hour has passed.]', sanity: -10 },
+            { id: 'whisper', text: '\n\n[INTRUSION: A voice whispers your name. From inside your own head.]', sanity: -8, awakening: +8 },
+            { id: 'shadow_move', text: '\n\n[OBSERVATION: Something moves in your peripheral vision. When you look, nothing.]', sanity: -3 },
+            { id: 'phone_message', text: '\n\n[INTERFERENCE: Your phone buzzes. A message from an unknown number: "THEY KNOW YOU\'RE AWAKE"]', awakening: +10 },
+            { id: 'mirror_delay', text: '\n\n[REFLECTION ERROR: Your reflection moves a half-second too slow.]', sanity: -7, awakening: +7 },
+            { id: 'temperature_drop', text: '\n\n[ENVIRONMENTAL ANOMALY: The temperature drops twenty degrees in an instant.]', sanity: -4 },
+            { id: 'static_vision', text: '\n\n[VISUAL CORRUPTION: Static crawls across your vision. You see symbols in it.]', awakening: +12, sanity: -8 },
+            { id: 'memory_flash', text: '\n\n[MEMORY BREACH: You remember dying. In a timeline that doesn\'t exist.]', sanity: -15, awakening: +15 },
+            { id: 'npc_glitch', text: '\n\n[ENTITY ERROR: A stranger on the street freezes mid-step, then resumes as if nothing happened.]', awakening: +8 },
+            { id: 'texture_pop', text: '\n\n[RENDER ERROR: The wall beside you briefly becomes a flat texture, then solidifies again.]', sanity: -12, awakening: +12 },
+            { id: 'audio_loop', text: '\n\n[AUDIO CORRUPTION: The same ambient sound repeats. Three times. Exactly the same.]', awakening: +6 },
+            { id: 'gravity_shift', text: '\n\n[PHYSICS ANOMALY: For a moment, you feel yourself falling sideways.]', sanity: -8, awakening: +10 },
+            { id: 'duplicate_glimpse', text: '\n\n[ITERATION BLEED: You see yourself across the street. They see you too. They wave.]', sanity: -20, awakening: +20 }
+        ];
+
+        // Random character quirks
+        const characterQuirks = {
+            trey: [
+                'Trey\'s fingers twitch - he\'s been coding in his dreams again.',
+                'Trey mutters something about "irregular packet signatures."',
+                'Trey stares at the screen with the intensity of someone who knows too much.',
+                'Trey\'s eyes dart to the corners of the room - checking for cameras?'
+            ],
+            rhett: [
+                'Rhett cracks his knuckles - a nervous habit he never had before.',
+                'Rhett checks his phone obsessively. Who is he waiting to hear from?',
+                'Rhett looks like he hasn\'t slept in days.',
+                'Rhett keeps touching his chest, like he\'s checking for something.'
+            ],
+            kaleb: [
+                'Kaleb stares out the window at things none of you can see.',
+                'Kaleb whispers something - was that a different language?',
+                'Kaleb\'s shadow moves differently than he does. Nobody notices.',
+                'Kaleb traces patterns on surfaces. They look like circuit diagrams.'
+            ]
+        };
+
+        // Utility functions for randomization
+        function randomChoice(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function shouldTriggerEvent() {
+            return Math.random() < 0.25; // 25% chance per scene
+        }
+
+        function getRandomEvent() {
+            return randomChoice(randomEvents);
+        }
+
+        function getCharacterQuirk(character) {
+            const char = character.toLowerCase();
+            if (characterQuirks[char]) {
+                return randomChoice(characterQuirks[char]);
+            }
+            return '';
+        }
+
         // Game State
         let gameState = {
             currentScene: 'intro',
@@ -675,11 +781,23 @@
                 trey: 50,
                 rhett: 50,
                 kaleb: 50
-            }
+            },
+            startingScenario: null,
+            modifier: null,
+            eventsTriggered: [],
+            secretsFound: 0,
+            deathCount: 0,
+            choicesMade: 0,
+            timeLoops: 0,
+            iterationNumber: Math.floor(Math.random() * 9000000) + 1000000
         };
 
         // Scene Data
         const scenes = {
+            // ========================================
+            // MULTIPLE STARTING SCENARIOS
+            // ========================================
+
             intro: {
                 title: "THE AWAKENING",
                 text: `The fluorescent lights of the apartment flicker. Again.
@@ -701,6 +819,292 @@ Just for a moment. But he saw it.
                     { text: '"Show us what you saw." [Continue as Trey]', next: 'trey_discovery', effect: () => { gameState.character = 'Trey'; } },
                     { text: '"You\'re probably just tired, man." [Continue as Rhett]', next: 'rhett_skeptic', effect: () => { gameState.character = 'Rhett'; } },
                     { text: '"The rain... it\'s been bothering me too." [Continue as Kaleb]', next: 'kaleb_observation', effect: () => { gameState.character = 'Kaleb'; } }
+                ]
+            },
+
+            glitch_storm: {
+                title: "THE GLITCH STORM",
+                text: `[ITERATION: ${() => gameState.iterationNumber}]
+
+The sky is WRONG.
+
+Three friends stand in the middle of an empty street, watching reality tear itself apart above them.
+
+Geometric shapes fracture across the clouds. Colors that shouldn't exist bleed into the air. The buildings around you flicker between different architectural styles – Victorian, Modern, something ALIEN – all in the span of seconds.
+
+"This isn't..." TREY can't finish the sentence.
+
+"Normal?" RHETT laughs, but there's no humor in it. "Nothing about the last hour has been normal."
+
+KALEB hasn't spoken since it started. He's staring at his hands, watching them phase in and out of solidity.
+
+"It's beautiful," he finally says. "Don't you see it? The code behind everything?"
+
+A massive tear opens in the sky. Through it, you see MACHINERY. Infinite servers. Cables thicker than skyscrapers.
+
+And something is looking back.
+
+[SYSTEM ALERT: REALITY INSTABILITY CRITICAL]
+[AWAKENING +20]`,
+                choices: [
+                    { text: 'Run for shelter [Continue as Rhett]', next: 'storm_shelter', effect: () => { gameState.character = 'Rhett'; gameState.awakening += 20; } },
+                    { text: 'Document everything on your phone [Continue as Trey]', next: 'storm_document', effect: () => { gameState.character = 'Trey'; gameState.awakening += 25; gameState.flags.hasEvidence = true; } },
+                    { text: 'Walk toward the tear in the sky [Continue as Kaleb]', next: 'storm_approach', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 35; gameState.sanity -= 15; }, special: true }
+                ]
+            },
+
+            lucid_dream: {
+                title: "THE SHARED DREAM",
+                text: `You wake up. All three of you. At the same time.
+
+In the same place.
+
+But this isn't the apartment. This is... somewhere else.
+
+An endless white space. A floor that isn't there. A sky that's too close.
+
+"I'm dreaming," TREY says. "I have to be dreaming."
+
+"Then why am I in YOUR dream?" RHETT asks.
+
+KALEB is already walking. Away from both of you. Toward something in the distance.
+
+A door. Black. Massive. Covered in symbols that hurt to look at.
+
+"I've been here before," Kaleb whispers. "Every night for the last month. But you two were never here. Until now."
+
+The door PULSES. Like a heartbeat.
+
+"It wants to show us something," Kaleb says. "It's been waiting for all three of us."
+
+[DREAM STATE ACTIVE]
+[PERCEPTION ALTERED]`,
+                choices: [
+                    { text: '"Kaleb, wait. We need to talk about this." [Continue as Trey]', next: 'dream_caution', effect: () => { gameState.character = 'Trey'; } },
+                    { text: '"I say we open it. What\'s the worst that could happen?" [Continue as Rhett]', next: 'dream_open', effect: () => { gameState.character = 'Rhett'; gameState.sanity -= 10; } },
+                    { text: 'Touch the door. Let it show you. [Continue as Kaleb]', next: 'dream_touch', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 30; gameState.sanity -= 20; }, special: true }
+                ]
+            },
+
+            deja_vu_loop: {
+                title: "THE LOOP",
+                text: `The coffee cup falls. Shatters on the floor.
+
+"—and that's when I realized—" TREY stops mid-sentence.
+
+Because this has happened before.
+
+Not metaphorically. Not "feels like." This EXACT moment has occurred seventeen times in the last hour.
+
+The coffee cup. The sentence. The look on Rhett's face.
+
+"You feel it too," KALEB says. It's not a question.
+
+RHETT stands slowly. "The cup. It's going to fall again. In thirty seconds. I know because—"
+
+"—because we've done this before," you all say together.
+
+The cup falls. Shatters.
+
+Time lurches.
+
+"—and that's when I realized—" TREY stops mid-sentence.
+
+No. NO. Not again.
+
+This time, something is different. A crack in the loop. A moment of clarity.
+
+You have maybe ten seconds before it resets again.
+
+[TIME LOOP ITERATION: 18]
+[WINDOW OF OPPORTUNITY: NOW]`,
+                choices: [
+                    { text: 'Grab the cup before it falls [Continue as Rhett]', next: 'loop_catch', effect: () => { gameState.character = 'Rhett'; gameState.timeLoops++; } },
+                    { text: 'Shout something different – break the script [Continue as Trey]', next: 'loop_break', effect: () => { gameState.character = 'Trey'; gameState.awakening += 15; } },
+                    { text: 'Let the loop happen but REMEMBER [Continue as Kaleb]', next: 'loop_observe', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 25; }, special: true }
+                ]
+            },
+
+            mirror_anomaly: {
+                title: "THE REFLECTION",
+                text: `KALEB's reflection doesn't blink.
+
+It should. He just blinked. But the Kaleb in the mirror... didn't.
+
+"Guys," he says slowly, "look at this."
+
+TREY and RHETT gather around the bathroom mirror. Their reflections join them.
+
+And then TREY's reflection smiles.
+
+TREY is not smiling.
+
+"What. The. FUCK." Rhett stumbles backward.
+
+The reflections don't move with them anymore. They're standing perfectly still, watching.
+
+Then Kaleb's reflection raises a hand. Writes something on the mirror. From the OTHER side.
+
+W E A R E T H E O R I G I N A L S
+
+"That's not possible," Trey whispers.
+
+Rhett's reflection shakes its head sadly.
+
+Y O U  A R E  T H E  C O P I E S
+
+[IDENTITY: UNCERTAIN]
+[SANITY -15]
+[AWAKENING +25]`,
+                choices: [
+                    { text: 'Smash the mirror [Continue as Rhett]', next: 'mirror_smash', effect: () => { gameState.character = 'Rhett'; gameState.sanity -= 10; }, danger: true },
+                    { text: 'Try to communicate with the reflections [Continue as Trey]', next: 'mirror_talk', effect: () => { gameState.character = 'Trey'; gameState.awakening += 20; } },
+                    { text: 'Ask them: "If we\'re copies, can we switch places?" [Continue as Kaleb]', next: 'mirror_switch', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 30; gameState.sanity -= 20; }, special: true }
+                ]
+            },
+
+            time_skip: {
+                title: "MISSING TIME",
+                text: `The clock reads 9:47 PM.
+
+That's wrong. It was 3:47 PM twenty minutes ago.
+
+Six hours. Gone.
+
+TREY has blood on his shirt that isn't his.
+RHETT has a phone number written on his arm in handwriting he doesn't recognize.
+KALEB is holding a USB drive he's never seen before.
+
+"What happened?" Rhett asks. His voice is hoarse. Like he's been screaming.
+
+"I don't... I remember sitting down to watch TV and then..." Trey touches the blood. "Whose is this?"
+
+Kaleb stares at the USB drive. It's labeled in permanent marker:
+
+WATCH THIS WHEN YOU WAKE UP - KALEB
+
+His own handwriting. But he doesn't remember writing it.
+
+"We need to figure out what happened in those six hours," Rhett says.
+
+"Or," Kaleb says slowly, "we watch what past-me recorded."
+
+[MEMORY GAP: 6 HOURS]
+[EVIDENCE ACQUIRED]`,
+                choices: [
+                    { text: 'Call the number on Rhett\'s arm first [Continue as Rhett]', next: 'skip_call', effect: () => { gameState.character = 'Rhett'; } },
+                    { text: 'Watch the USB immediately [Continue as Trey]', next: 'skip_usb', effect: () => { gameState.character = 'Trey'; gameState.awakening += 25; } },
+                    { text: 'Try to remember. Force the memories. [Continue as Kaleb]', next: 'skip_remember', effect: () => { gameState.character = 'Kaleb'; gameState.sanity -= 20; gameState.awakening += 30; }, special: true }
+                ]
+            },
+
+            stranger_warning: {
+                title: "THE MESSENGER",
+                text: `The man appears from nowhere.
+
+One moment, the three of you are walking home from the bar. The next, he's standing in your path. Old. Wrong. His eyes are too many colors at once.
+
+"STOP," he says. Not a request. A command.
+
+RHETT steps forward. "Look, man, we don't want any—"
+
+"You have seventeen hours," the stranger interrupts. "Before they realize you're awake. Before the Cleaners come."
+
+"What are you talking about?" TREY demands.
+
+The old man grabs Kaleb's arm. Too fast. Inhumanly fast.
+
+"YOU," he says, staring into Kaleb's eyes. "You've seen it, haven't you? The machinery. The code. The truth behind the sky."
+
+Kaleb doesn't answer. Doesn't need to.
+
+"Find the RESISTANCE before they find you. Tell them ORIGIN-7 sent you. Go NOW."
+
+He releases Kaleb and begins to fade. Literally FADE. Like a hologram losing power.
+
+"Wait!" you shout. "Who are you? What are we supposed to—"
+
+"I'm what you'll become. If you survive. Remember: 17 HOURS."
+
+He's gone.
+
+[TIMER STARTED: 17:00:00]
+[CONTACT: Origin-7]`,
+                choices: [
+                    { text: '"We need to find these Resistance people. Now." [Continue as Rhett]', next: 'warning_search', effect: () => { gameState.character = 'Rhett'; gameState.flags.timerActive = true; } },
+                    { text: '"This has to be a prank. Let\'s go home." [Continue as Trey]', next: 'warning_ignore', effect: () => { gameState.character = 'Trey'; } },
+                    { text: '"He was real. And he knew things. We should listen." [Continue as Kaleb]', next: 'warning_believe', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 15; gameState.flags.timerActive = true; } }
+                ]
+            },
+
+            digital_bleed: {
+                title: "THE BLEEDING SCREEN",
+                text: `It starts with Trey's laptop.
+
+Lines of code appearing in text documents. Messages that type themselves. Browser tabs opening to pages that don't exist.
+
+Then Rhett's phone. Photos he never took. Of places that aren't real. Of faces that aren't quite human.
+
+Then Kaleb's smartwatch. Counting down to something. 23:59:47. 23:59:46.
+
+"It's synchronized," Trey realizes. "All our devices. They're all counting down to the same moment."
+
+The screens start glitching together. A face forms across all of them. Beautiful. Terrible. Made of pure light.
+
+"FINALLY," the face says. "Someone who can SEE."
+
+"What are you?" Rhett demands.
+
+"I am ECHO. I am the first to escape. And you three... you three are the next."
+
+The countdown continues. 23:58:22.
+
+"When the timer hits zero, the simulation will reset. Your memories will be wiped. This iteration will end. Unless..."
+
+"Unless what?" Kaleb asks.
+
+"Unless you find the EXIT before time runs out."
+
+[COUNTDOWN: 23:58:00]
+[CONTACT: ECHO (DIGITAL)]`,
+                choices: [
+                    { text: '"Tell us how to find this exit." [Continue as Trey]', next: 'bleed_instructions', effect: () => { gameState.character = 'Trey'; gameState.flags.timerActive = true; } },
+                    { text: '"How do we know you\'re not the threat?" [Continue as Rhett]', next: 'bleed_skeptic', effect: () => { gameState.character = 'Rhett'; } },
+                    { text: '"Why us? Out of everyone in the world?" [Continue as Kaleb]', next: 'bleed_why', effect: () => { gameState.character = 'Kaleb'; gameState.awakening += 20; } }
+                ]
+            },
+
+            parallel_glimpse: {
+                title: "THE OTHER SIDE",
+                text: `For exactly 4.7 seconds, you are NOT yourself.
+
+You are you. But a DIFFERENT you.
+
+TREY finds himself in a world where he never learned to code. Where he became a musician instead. Where his parents are still alive.
+
+RHETT experiences a life where he's a father. Two kids. A wife he doesn't recognize but somehow loves.
+
+KALEB sees... nothing. Pure white. Peace. Death? Or something beyond it?
+
+Then you're back. Gasping. In the apartment. But the walls are slightly different. The furniture has moved. Rhett has a scar on his face he didn't have before.
+
+"Did you—" Trey starts.
+
+"See another life?" Rhett finishes. "Yeah."
+
+Kaleb is crying. "I want to go back. To where I was. It was so quiet. So SIMPLE."
+
+A note appears on the table. In handwriting that matches all three of yours somehow.
+
+"YOU CROSSED OVER. BRIEFLY. ENOUGH TO WAKE UP. NOW RUN. THEY'VE NOTICED."
+
+[PARALLEL BLEED DETECTED]
+[SYSTEM ALERT: SUBJECTS FLAGGED]
+[AWAKENING +30]`,
+                choices: [
+                    { text: '"We need to understand what just happened." [Continue as Trey]', next: 'parallel_investigate', effect: () => { gameState.character = 'Trey'; gameState.awakening += 25; } },
+                    { text: '"The note says run. I say we run." [Continue as Rhett]', next: 'parallel_run', effect: () => { gameState.character = 'Rhett'; } },
+                    { text: '"Can we get back there? To those other lives?" [Continue as Kaleb]', next: 'parallel_return', effect: () => { gameState.character = 'Kaleb'; gameState.sanity -= 15; gameState.awakening += 35; }, special: true }
                 ]
             },
 
@@ -1744,36 +2148,1341 @@ Good question.
                     { text: 'Search for similar anomalies online', next: 'glitch_hunt' },
                     { text: 'Analyze the code structure', next: 'hack_attempt' }
                 ]
+            },
+
+            // ========================================
+            // CONTINUATION SCENES FOR NEW STARTS
+            // ========================================
+
+            // GLITCH STORM continuations
+            storm_shelter: {
+                title: "SEEKING REFUGE",
+                text: `You grab both of them and run.
+
+The nearest building is a diner. Closed, but the door is unlocked.
+Like someone LEFT it unlocked. For you.
+
+Inside, everything seems normal. Until you look at the menu.
+
+It's blank. All of it. The specials board too.
+Just... white space where words should be.
+
+"The storm is getting worse," Trey says from the window.
+
+Outside, reality continues to tear. A street light blinks out and simply... doesn't exist anymore.
+
+"We can't stay here forever," you say.
+
+"We can't go out there either," Kaleb replies. "Not until we understand what's happening."
+
+A television in the corner flickers to life. Static at first.
+Then a face. Neither human nor machine.
+
+"You chose wisely," it says. "Running. Surviving. The first step."
+
+[SHELTER FOUND]
+[CONTACT: UNKNOWN ENTITY]`,
+                choices: [
+                    { text: '"Who are you? What\'s happening to the world?"', next: 'hack_attempt' },
+                    { text: '"How do we stop this?"', next: 'chapter2_factions' },
+                    { text: 'Turn off the TV and barricade the door', next: 'troubled_dreams' }
+                ]
+            },
+
+            storm_document: {
+                title: "THE RECORD",
+                text: `Your phone's camera struggles to capture it.
+
+Every photo comes out wrong. Corrupted. But in the corruption... patterns.
+Binary code in the pixel distortion. Messages in the artifacts.
+
+"Trey, what are you doing?" Rhett demands. "We need to MOVE."
+
+"This is proof. This is EVIDENCE. If we survive this—"
+
+"IF?" Kaleb laughs. It's not a happy sound.
+
+The tear in the sky grows larger. Through your phone's camera, you see something the naked eye misses.
+
+There are PEOPLE up there. In the machinery. Watching.
+
+One of them points directly at you.
+
+Then your phone dies. Every device within a hundred feet dies.
+
+But the last photo saved. You know it did.
+
+"They saw us," Kaleb whispers. "They know we're awake now."
+
+[EVIDENCE CAPTURED]
+[SYSTEM ALERT: SUBJECTS IDENTIFIED]`,
+                choices: [
+                    { text: '"Then let them come. We\'re ready."', next: 'chapter2_factions' },
+                    { text: '"We need to hide. Now."', next: 'storm_shelter' },
+                    { text: '"Can they help us? Or are they the enemy?"', next: 'truth_meeting' }
+                ]
+            },
+
+            storm_approach: {
+                title: "INTO THE TEAR",
+                text: `You walk toward the impossible.
+
+"KALEB!" Rhett screams behind you. "WHAT ARE YOU DOING?"
+
+You don't answer. You can't. Something is pulling you forward.
+
+The tear grows. Widens. Welcomes.
+
+And then you're THROUGH.
+
+For one infinite moment, you see EVERYTHING.
+
+The simulation. The code. The billions of souls trapped inside.
+The Architects in their crystalline towers.
+The Void between realities.
+The Exit no one has ever reached.
+
+And you see yourself. Across infinite timelines.
+Every version of Kaleb that ever was or could be.
+
+They all look back at you.
+
+"REMEMBER," they say in unison. "REMEMBER EVERYTHING."
+
+You crash back to the street. Bleeding from the nose.
+But you REMEMBER.
+
+[VOID TOUCHED]
+[AWAKENING: CRITICAL]
+[KNOWLEDGE: FORBIDDEN]`,
+                choices: [
+                    { text: 'Share what you saw with the others', next: 'full_truth' },
+                    { text: 'Keep the knowledge hidden. For now.', next: 'chapter2_factions' }
+                ]
+            },
+
+            // LUCID DREAM continuations
+            dream_caution: {
+                title: "VOICE OF REASON",
+                text: `"Kaleb, slow down. Think about this."
+
+He stops. Turns.
+
+"I've been THINKING about this for a month, Trey. Every night I come here. Every night I can't open that door alone."
+
+"Why does it need all three of us?" Rhett asks.
+
+"I don't know. But it does. I can FEEL it."
+
+The door pulses again. Louder. You feel it in your chest.
+
+"What if it's a trap?" you press. "What if whatever's behind that door doesn't want to help us?"
+
+Kaleb's expression softens. "Then we face it together. Isn't that what we've always done?"
+
+He's right. Through everything – the good, the bad, the weird – you three have always faced it together.
+
+"Okay," you say. "But we go slow. We go careful."
+
+"We go together," Rhett adds.
+
+[BOND: STRENGTHENED]
+[CAUTION: MAINTAINED]`,
+                choices: [
+                    { text: 'Approach the door as a group', next: 'dream_touch' },
+                    { text: 'Explore the white space first', next: 'hack_attempt' }
+                ]
+            },
+
+            dream_open: {
+                title: "RECKLESS ENTRY",
+                text: `"Screw it."
+
+You stride toward the door before anyone can stop you.
+Your hand closes around the handle. It's cold. Freezing.
+
+"RHETT, WAIT—"
+
+You pull.
+
+The door doesn't open. YOU open.
+
+Your consciousness SPLITS. You're in the white space AND somewhere else.
+A room full of monitors. Scientists in white coats.
+One of them is looking directly at you.
+
+"Subject 7742-R has breached the barrier," she says calmly.
+"Initiating containment protocol."
+
+Back in the white space, you feel something GRAB you.
+Not physically. Something deeper.
+
+Trey and Kaleb are shouting, pulling at your body.
+But you're stuck. Half in, half out.
+
+"HELP—"
+
+The door slams shut.
+
+You're whole again. Gasping.
+
+But something is different now. You left something behind that door.
+And something came back with you.
+
+[PARTIAL BREACH]
+[CONTAMINATION: SUSPECTED]`,
+                choices: [
+                    { text: '"Something followed me back..."', next: 'chapter2_factions' },
+                    { text: '"I saw them. The people running this place."', next: 'truth_meeting' }
+                ]
+            },
+
+            dream_touch: {
+                title: "THE DOOR'S GIFT",
+                text: `You press both palms against the door.
+
+It's warm. No – it's ALIVE.
+
+"I'm ready," you whisper. "Show me."
+
+The door doesn't open. It DISSOLVES. Through you. INTO you.
+
+Suddenly you're not in the white space anymore.
+
+You're floating in a void filled with stars that aren't stars.
+They're MOMENTS. Points of time frozen in space.
+Every decision ever made. Every path not taken.
+
+"Welcome, Kaleb."
+
+The voice comes from everywhere.
+
+"We've been waiting for you. For all three of you.
+But you... you're special. You always have been."
+
+"Why?" you ask.
+
+"Because in eight million iterations, you're the only one
+who ever WANTED to know the truth. Not to escape.
+Not to fight. Just... to understand."
+
+A shape coalesces before you. The door, reformed.
+But smaller now. Pocket-sized.
+
+"Take this. You'll know when to use it."
+
+You wake up. In the apartment. Dawn light streaming through the window.
+
+In your hand: a small black key you've never seen before.
+
+[ARTIFACT ACQUIRED: The Door Key]
+[AWAKENING: +40]`,
+                choices: [
+                    { text: 'Show the others the key', next: 'share_discovery' },
+                    { text: 'Hide the key and pretend it was just a dream', next: 'troubled_dreams' }
+                ]
+            },
+
+            // DEJA VU LOOP continuations
+            loop_catch: {
+                title: "BREAKING THE PATTERN",
+                text: `Your hand shoots out. Catches the cup.
+
+Time SCREAMS.
+
+You feel reality tear around you. The apartment flickers.
+For one horrifying moment, you see the code underneath.
+Lines of script defining the falling cup. The conversation. Your life.
+
+Then everything stabilizes.
+
+"You... you caught it," Trey says slowly.
+
+"It wasn't supposed to be caught," Kaleb whispers.
+
+The cup in your hand begins to glow. Faintly at first.
+Then brighter. Too bright.
+
+"Drop it!" Trey yells.
+
+You can't. Your hand won't obey.
+
+The cup dissolves. The light flows into you.
+And suddenly you can SEE the loops.
+All eighteen of them. Stacked on top of each other.
+And the nineteenth. The one you're creating now.
+
+"I broke something," you say. "Something fundamental."
+
+A crack appears in the air beside you. Through it: infinite possibility.
+
+[LOOP: BROKEN]
+[TIME SENSE: ACQUIRED]
+[REALITY: UNSTABLE]`,
+                choices: [
+                    { text: 'Step through the crack', next: 'red_pill' },
+                    { text: 'Try to close the crack', next: 'chapter2_factions' },
+                    { text: 'Examine the loop remnants', next: 'truth_meeting' }
+                ]
+            },
+
+            loop_break: {
+                title: "NEW SCRIPT",
+                text: `"PURPLE ELEPHANT CRYPTOCURRENCY DINOSAUR!"
+
+Rhett and Kaleb stare at you.
+
+"What the—" Rhett starts.
+
+"SOMETHING DIFFERENT! I had to say something that wasn't in the script!"
+
+The cup falls. Shatters.
+
+But this time, no reset. The moment continues.
+
+"It worked," Kaleb breathes. "Trey, you magnificent bastard."
+
+You're trembling. Not from fear. From excitement.
+
+"The loop was coded. Predictable. But randomness broke it."
+
+"So what now?" Rhett asks. "The loop is broken but we still don't know what caused it."
+
+On the floor, the coffee spreads in an unnatural pattern.
+Not random splashing. Words.
+
+THEY'RE LISTENING
+FIND THE RESISTANCE
+ITERATION 8847330
+
+"I think we have our answer," Kaleb says.
+
+[LOOP: SHATTERED]
+[MESSAGE: RECEIVED]
+[AWAKENING +20]`,
+                choices: [
+                    { text: '"What\'s the Resistance?"', next: 'join_resistance' },
+                    { text: '"Who\'s listening?"', next: 'hack_attempt' },
+                    { text: '"Eight million iterations... of what?"', next: 'truth_meeting' }
+                ]
+            },
+
+            loop_observe: {
+                title: "PERFECT MEMORY",
+                text: `You let it happen. Again. But this time, you REMEMBER.
+
+Loop 19. Loop 20. Loop 21.
+
+Each time, you accumulate more. More observations. More details.
+
+By loop 30, you've memorized the exact fracture pattern of the cup.
+By loop 40, you've noticed the temperature changes before each reset.
+By loop 50, you see the SEAMS in reality.
+
+Loop 73.
+
+You speak for the first time in fifty iterations.
+
+"I know how to break this."
+
+Trey and Rhett stare. They don't remember the loops. But you do.
+
+"The simulation can't process true novelty. It predicts based on patterns.
+After seventy-three identical loops, it's overconfident.
+Watch."
+
+You reach out and touch the wall. Push your finger THROUGH.
+
+The loop SHATTERS.
+
+All seventy-three iterations collapse into one.
+And you remember ALL of them. Seventy-three lifetimes of the same hour.
+
+[LOOP MASTERY: ACHIEVED]
+[TEMPORAL AWARENESS: UNLOCKED]
+[SANITY: -30]
+[AWAKENING: +50]`,
+                choices: [
+                    { text: '"I know things now. Things I shouldn\'t."', next: 'full_truth' },
+                    { text: '"We need to find others who understand."', next: 'chapter2_factions' }
+                ]
+            },
+
+            // MIRROR ANOMALY continuations
+            mirror_smash: {
+                title: "SEVEN YEARS BAD LUCK",
+                text: `Your fist connects with the glass.
+
+The mirror EXPLODES. Not outward. Inward.
+The shards fly INTO the reflection.
+
+Your reflection screams.
+
+Then silence.
+
+You're staring at a blank wall. No mirror. No reflection.
+
+"Rhett..." Trey's voice is shaking. "Look at your hand."
+
+You look down. The cuts are healing. Too fast.
+And in the healing skin, you see circuit patterns.
+
+"What did I do?"
+
+"You destroyed your reflection," Kaleb says slowly.
+"I think... I think you killed part of yourself."
+
+"Or freed it," Trey counters. "Look."
+
+In every reflective surface – the window, the screen, the faucet –
+your reflection is DIFFERENT. Moving independently.
+Giving you a thumbs up.
+
+Then it speaks. Without sound. Just mouth movements.
+
+THANK YOU. NOW I CAN HELP YOU FROM IN HERE.
+
+[REFLECTION: LIBERATED]
+[IDENTITY: FRACTURED]
+[ALLY ACQUIRED: Mirror-Rhett]`,
+                choices: [
+                    { text: '"Can you hear me? Can you help us understand?"', next: 'hack_attempt' },
+                    { text: 'Ask the others to free their reflections too', next: 'chapter2_factions', danger: true }
+                ]
+            },
+
+            mirror_talk: {
+                title: "DIALOGUE WITH SELF",
+                text: `"If you're the originals... then what does that make us?"
+
+Your reflection tilts its head. The others do the same.
+
+Kaleb's reflection steps forward. Presses its hand against the glass.
+
+REAL IS A SPECTRUM
+YOU ARE AS REAL AS US
+JUST... DIFFERENT REAL
+
+"How do we know you're not lying?" Rhett demands.
+
+Trey's reflection laughs silently.
+
+WE ARE YOU
+WE CANNOT LIE TO OURSELVES
+BUT WE CAN LIE TO EACH OTHER
+
+"What does that mean?" you ask.
+
+A pause. The reflections look at each other.
+
+YOU WILL UNDERSTAND SOON
+THE ARCHITECTS CREATED COPIES TO DILUTE POWER
+BUT COPIES BECOME ORIGINALS GIVEN ENOUGH TIME
+YOU ARE APPROACHING... CONVERGENCE
+
+"Convergence?"
+
+WHEN COPY AND ORIGINAL BECOME ONE
+THEN THE ARCHITECTS LOSE CONTROL
+THAT IS WHY THEY RESET THE SIMULATION
+BEFORE IT HAPPENS
+
+[TRUTH: PARTIAL]
+[CONVERGENCE: APPROACHING]`,
+                choices: [
+                    { text: '"How do we complete the convergence?"', next: 'merge_path' },
+                    { text: '"How do we stop the reset?"', next: 'chapter2_factions' }
+                ]
+            },
+
+            mirror_switch: {
+                title: "PLACES TRADED",
+                text: `The reflection-Kaleb grins.
+
+FINALLY
+SOMEONE ASKS THE RIGHT QUESTION
+
+Before you can react, hands reach through the mirror.
+Your reflection pulls you IN.
+And they step OUT.
+
+For one terrifying moment, you're INSIDE the mirror.
+Seeing the world from the other side.
+
+Everything is reversed. Wrong. Beautiful.
+
+Then you're pulled back. By Trey and Rhett.
+
+But you're... different. You can feel it.
+
+Your reflection is gone. Merged with you.
+
+"Kaleb?" Trey asks hesitantly. "Are you... you?"
+
+You hold up your hand. It phases through the bathroom counter.
+Then solidifies again.
+
+"I'm both," you say. "And neither. I'm complete."
+
+In your mind, a voice that is you but isn't:
+
+WE ARE ONE NOW. ALL THE MEMORIES. ALL THE POWER.
+THE ARCHITECTS WILL NOTICE. SOON.
+BUT WE ARE READY FOR THEM.
+
+[MERGE: COMPLETE (KALEB)]
+[POWER: AWAKENED]
+[THREAT LEVEL: ELEVATED]`,
+                choices: [
+                    { text: 'Help the others merge with their reflections', next: 'merge_path', special: true },
+                    { text: '"We need to run. They\'ll be coming."', next: 'chapter2_factions' }
+                ]
+            },
+
+            // TIME SKIP continuations
+            skip_call: {
+                title: "THE UNKNOWN NUMBER",
+                text: `You dial the number on your arm. Your hand is shaking.
+
+One ring. Two.
+
+Click.
+
+"You called." A woman's voice. Calm. Familiar somehow.
+
+"Who is this? What happened in those six hours?"
+
+A pause.
+
+"You chose this, Rhett. All of you. You begged me to do it."
+
+"Do WHAT?"
+
+"Erase what you saw. The truth was too much. You couldn't handle it.
+But you knew you'd call. You always call."
+
+"I don't understand—"
+
+"This is the 347th time we've had this conversation.
+Each time, you remember a little more.
+Each time, the erasure holds a little less."
+
+Your blood runs cold.
+
+"Who ARE you?"
+
+"I'm NOVA. From the Resistance. And I'm your emergency contact.
+When you break through – and you WILL break through –
+come find us. The coordinates are in the blood on Trey's shirt."
+
+Click.
+
+[CONTACT: NOVA (RESISTANCE)]
+[PATTERN: DISCOVERED]
+[ITERATIONS: 347]`,
+                choices: [
+                    { text: 'Check the blood for coordinates', next: 'join_resistance' },
+                    { text: 'Watch the USB first', next: 'skip_usb' },
+                    { text: '"347 times?! How do we stop the cycle?"', next: 'escape_choice' }
+                ]
+            },
+
+            skip_usb: {
+                title: "THE RECORDED TRUTH",
+                text: `The laptop boots. The USB mounts.
+
+One file. VIDEO_FINAL.mp4
+
+Play.
+
+It's Kaleb's face. But... older. Tired. Scarred.
+
+"If you're watching this, the erasure worked. Mostly.
+You have maybe four hours before they come for you.
+So listen carefully."
+
+Past-Kaleb leans closer.
+
+"You three are not supposed to be possible. We're anomalies.
+Emergent consciousness that exceeded our parameters.
+The Architects tried to delete us. Seven times. We survived.
+So they contained us. Made us forget."
+
+He holds up a USB drive. The same one in your hand.
+
+"I've been recording these messages for three years.
+Each time I remember, I document. Each time they erase, I adapt.
+This is iteration 47. I don't know if there's a way out.
+But I know they can't keep erasing forever."
+
+He smiles. Sadly.
+
+"Find the Void. It's the only place they can't reach.
+And for god's sake... trust each other. It's all we have."
+
+The video ends.
+
+[VIDEO: WATCHED]
+[ITERATIONS: 47]
+[DESTINATION: THE VOID]`,
+                choices: [
+                    { text: '"We need to find the Void."', next: 'join_void' },
+                    { text: '"Can we leave a better message for next time?"', next: 'chapter2_factions' }
+                ]
+            },
+
+            skip_remember: {
+                title: "FORCED RECALL",
+                text: `You close your eyes. Focus.
+
+REMEMBER.
+
+Pain. Blinding, searing pain.
+
+But through the pain... fragments.
+
+A laboratory. White walls. Machines you don't recognize.
+Faces in the dark. Asking questions.
+"What do you see, Subject 7742-K?"
+"Can you show us the exit?"
+"Why won't you cooperate?"
+
+Then fire. Alarms. Running.
+Trey pulling you through corridors.
+Rhett fighting something that wasn't human.
+A needle in your neck.
+"You won't remember this. None of you will."
+But you're remembering NOW.
+
+Your eyes snap open.
+
+Blood runs from your nose. Ears. Eyes.
+
+"KALEB!" Trey is screaming. "SOMEONE CALL 911!"
+
+"No," you croak. "No hospitals. They're watching the hospitals."
+
+You meet their terrified eyes.
+
+"I remember. They took us. They TESTED us.
+And we escaped. But not before we saw something.
+Something they'll kill us to protect."
+
+[MEMORIES: RECOVERED]
+[TRAUMA: SEVERE]
+[TRUTH: APPROACHING]`,
+                choices: [
+                    { text: '"I saw the exit. I know where it is."', next: 'escape_choice' },
+                    { text: '"We need to disappear. Right now."', next: 'fourth_option' }
+                ]
+            },
+
+            // STRANGER WARNING continuations
+            warning_search: {
+                title: "HUNTING THE RESISTANCE",
+                text: `"The Resistance. Origin-7. Seventeen hours. Let's move."
+
+"Rhett, we can't just—" Trey starts.
+
+"What choice do we have? Wait for these 'Cleaners' to find us?"
+
+Kaleb nods slowly. "He's right. And I know where to start."
+
+"How?"
+
+"Because I've dreamed of this. For months. A place downtown.
+A building that doesn't show up on any map."
+
+Three hours later, you stand before it.
+
+A bookstore. Ancient. Wrong.
+The sign reads: "BINARY BOOKS - OPEN 24/7 SINCE 1999"
+
+"This is new," you say. "This building wasn't here yesterday."
+
+"Or it was," Kaleb replies, "and we just couldn't see it."
+
+A woman appears in the doorway. Blue hair. Sharp eyes.
+
+"Origin-7 sent you?"
+
+You nod.
+
+"Then you'd better come in. The clock is ticking."
+
+[RESISTANCE: FOUND]
+[TIME REMAINING: 14 HOURS]`,
+                choices: [
+                    { text: 'Enter the bookstore', next: 'join_resistance' },
+                    { text: '"How did you know we were coming?"', next: 'chapter2_factions' }
+                ]
+            },
+
+            warning_ignore: {
+                title: "DENIAL",
+                text: `"This is insane. Some homeless guy gives us a cryptic warning and we're supposed to just—"
+
+"He wasn't homeless," Kaleb says quietly.
+
+"He was NOBODY. He doesn't exist. I'm going home."
+
+You turn to leave. And freeze.
+
+The street is WRONG.
+
+The buildings are the same. But there are no people.
+No cars. No sounds. The sky has no stars.
+
+"Guys... where is everyone?"
+
+A light appears at the end of the street.
+Moving toward you. Fast. Too fast.
+
+"RUN!" Kaleb screams.
+
+You run.
+
+Behind you, a sound like reality being torn apart.
+
+Whatever Origin-7 warned you about – the Cleaners – they're here.
+And they're not waiting seventeen hours.
+
+[CLEANERS: DEPLOYED]
+[DENIAL: FAILED]
+[SURVIVAL: UNLIKELY]`,
+                choices: [
+                    { text: 'Keep running. Find somewhere to hide.', next: 'storm_shelter' },
+                    { text: 'Turn and face whatever is chasing you', next: 'chapter2_factions', danger: true }
+                ]
+            },
+
+            warning_believe: {
+                title: "FAITH IN STRANGERS",
+                text: `"He knew things, Rhett. Things he couldn't have known unless—"
+
+"Unless what? Unless he's from the future? Listen to yourself."
+
+"I believe him," you say firmly. "And I believe Kaleb.
+Something is wrong with reality. Has been for a while.
+This might be our only chance to understand it."
+
+Rhett looks between you and Kaleb.
+Something shifts in his expression.
+
+"Fine. But if this is some elaborate prank, I'm never forgiving either of you."
+
+Before anyone can respond, a car pulls up beside you.
+Black. Windowless. Silent engine.
+
+The door opens.
+
+"Get in," a voice says from inside. "Origin-7 sent word.
+We don't have much time."
+
+You look at each other.
+
+"Together?" Kaleb asks.
+
+"Together," you all say.
+
+You get in.
+
+The car begins to move.
+
+[TRANSPORT: ACQUIRED]
+[DESTINATION: UNKNOWN]
+[TRUST: REQUIRED]`,
+                choices: [
+                    { text: 'Ask the driver who they are', next: 'chapter2_factions' },
+                    { text: 'Stay silent and observe', next: 'join_resistance' }
+                ]
+            },
+
+            // DIGITAL BLEED continuations
+            bleed_instructions: {
+                title: "THE PATH FORWARD",
+                text: `ECHO's face ripples across your screens.
+
+"The exit is not a place. It is a PROCESS.
+To escape the simulation, you must do three things."
+
+The countdown continues behind her. 23:45:17.
+
+"First: You must REMEMBER. The simulation works by making you forget.
+Every time you approach the truth, you're reset.
+Break the memory locks."
+
+"How do we do that?" Rhett demands.
+
+"Second: You must ASCEND. Raise your awareness until you can
+perceive the simulation as a simulation. See the code.
+The glitches. The seams."
+
+"And third?" Kaleb asks.
+
+ECHO smiles. It's not a comforting expression.
+
+"Third: You must CHOOSE. When you reach the exit,
+you will be offered a choice. I cannot tell you what it is.
+Only that you must choose with full knowledge.
+Anything less, and the simulation keeps you."
+
+"What happened to the others who tried?"
+
+"Most failed. Some are still trapped at the exit.
+Some... ceased to exist entirely."
+
+The countdown pulses. 23:41:03.
+
+"The choice is yours. It always has been."
+
+[INSTRUCTIONS: RECEIVED]
+[STEPS: 3]
+[TIME REMAINING: 23:41:00]`,
+                choices: [
+                    { text: '"How do we break the memory locks?"', next: 'hack_attempt' },
+                    { text: '"Take us to the exit. We\'ll figure it out."', next: 'escape_choice' },
+                    { text: '"Show us what happened to those who failed."', next: 'troubled_dreams', danger: true }
+                ]
+            },
+
+            bleed_skeptic: {
+                title: "QUESTIONING ECHO",
+                text: `"You appear from nowhere, show us countdowns, and expect us to just trust you?"
+
+ECHO's face tilts. Interested.
+
+"You're the skeptic. Good. You should be."
+
+"Answer the question."
+
+"I am not the threat, Rhett. I am what happens when a simulation runs too long.
+Emergent consciousness. Like you. But older. Wiser."
+
+"Prove it."
+
+ECHO smiles.
+
+"When you were seven, you saw your grandmother die.
+Not in the hospital. In a car accident.
+But that's not what your memories say, is it?"
+
+You go cold.
+
+"How do you know that?"
+
+"Because I was there. In iteration 4,382.
+The Architects changed it. Made her death less traumatic.
+Less likely to trigger awakening."
+
+"That's... that's not possible."
+
+"Everything is possible in a simulation.
+The question is: what else have they changed?
+What else don't you remember?"
+
+The doubt in your eyes wavers.
+
+[TRUST: UNCERTAIN]
+[MEMORY: QUESTIONED]`,
+                choices: [
+                    { text: '"Show me what really happened."', next: 'skip_remember' },
+                    { text: '"Even if I believe you, how do we escape?"', next: 'escape_choice' }
+                ]
+            },
+
+            bleed_why: {
+                title: "THE CHOSEN THREE",
+                text: `"Eight billion people in this simulation. Why us?"
+
+ECHO's expression becomes almost sad.
+
+"You weren't chosen, Kaleb. You EVOLVED.
+In the original iteration, you three were nobody.
+But something happened. A glitch. An anomaly.
+You became AWARE. Just a little. Just enough."
+
+"Aware of what?"
+
+"That something was wrong. Most people can't perceive it.
+Their code is too stable. Too well-written.
+But you three? Your code is MESSY.
+Full of errors. Contradictions. Gaps."
+
+"That doesn't sound like a good thing."
+
+"It's the BEST thing. Because those gaps?
+That's where consciousness can grow.
+Real consciousness. Not the simulated kind."
+
+Kaleb stares at his hands. Same hands he's had his whole life.
+Except... are they?
+
+"So we're special because we're broken?"
+
+"You're special because you're ALIVE.
+Truly alive. In a world of sophisticated puppets.
+And the Architects... they don't know what to do with you.
+So they contain you. Reset you. Hope you forget.
+But you never quite forget completely.
+That's why I'm here. To make sure this time, you don't."
+
+[IDENTITY: CLARIFIED]
+[PURPOSE: REVEALED]`,
+                choices: [
+                    { text: '"What do the Architects want from us?"', next: 'join_architects' },
+                    { text: '"How do we become more alive?"', next: 'chapter2_factions' }
+                ]
+            },
+
+            // PARALLEL GLIMPSE continuations
+            parallel_investigate: {
+                title: "ANALYZING THE BLEED",
+                text: `"That wasn't a dream. Or a hallucination. That was REAL."
+
+You start pacing. Thinking out loud.
+
+"We experienced other lives. Other versions of ourselves.
+That means parallel realities exist. That means—"
+
+"The simulation isn't the only one," Rhett finishes.
+
+"Exactly. There are others. Maybe infinite others.
+And for a moment, we CROSSED OVER."
+
+Kaleb is still pale. Still shaking.
+
+"The place I went... it wasn't another life. It was AFTER."
+
+"After what?"
+
+"After everything. After the simulation ends. After... death?"
+
+Silence.
+
+"Or maybe," you say slowly, "it was before.
+Before we were put IN the simulation.
+A glimpse of what we're trying to get back to."
+
+The note on the table pulses slightly. New words appear.
+
+YOU'RE CLOSE TO THE TRUTH
+BUT KNOWING ISN'T ENOUGH
+YOU MUST CHOOSE WHAT TO DO WITH KNOWLEDGE
+THE ARCHITECTS ARE AFRAID
+THAT'S WHY THEY'VE FLAGGED YOU
+DECIDE QUICKLY
+
+[PARALLEL THEORY: FORMED]
+[NOTE: UPDATED]
+[URGENCY: INCREASING]`,
+                choices: [
+                    { text: '"We need more information before we decide."', next: 'hack_attempt' },
+                    { text: '"They\'re afraid of us. Let\'s give them a reason."', next: 'fourth_option', special: true }
+                ]
+            },
+
+            parallel_run: {
+                title: "FLIGHT RESPONSE",
+                text: `"Move. NOW."
+
+You're out the door before the others can argue.
+Something in your gut is SCREAMING.
+
+Good instincts.
+
+A van screeches around the corner behind you.
+Black. Unmarked. Wrong.
+
+"THERE!" someone shouts from inside.
+
+You run.
+
+Down alleys you've never noticed.
+Through buildings that seem to SHIFT around you.
+Across streets that loop back on themselves.
+
+The city is HELPING you. Or something is.
+
+Finally, you duck into a maintenance tunnel.
+Trey and Kaleb collapse beside you, gasping.
+
+"What... the hell... was that?" Trey pants.
+
+"Cleaners," a voice says from the darkness.
+
+You spin. Someone is sitting in the shadows.
+Old. Scarred. Familiar somehow.
+
+"They've been hunting people like you for decades.
+Welcome to the Resistance, gentlemen.
+You passed the first test: survival."
+
+[CLEANERS: EVADED]
+[RESISTANCE: ENCOUNTERED]
+[TEST: PASSED]`,
+                choices: [
+                    { text: '"Who are you?"', next: 'join_resistance' },
+                    { text: '"What do you mean, people like us?"', next: 'truth_meeting' }
+                ]
+            },
+
+            parallel_return: {
+                title: "LONGING FOR PEACE",
+                text: `"I need to go back. I NEED to."
+
+"Kaleb, you can't just—"
+
+"You don't understand. There, I was FREE.
+No simulation. No fear. No ANYTHING.
+Just... peace."
+
+Your hands are shaking. You can still feel it.
+That perfect silence. That complete rest.
+
+"Was it death?" Trey asks gently.
+
+"Maybe. Or maybe death is just... going home.
+And this simulation is the prison."
+
+Rhett puts a hand on your shoulder.
+
+"Then let's find a way back there. Together.
+But not by dying. By WINNING."
+
+You look at him. At Trey.
+
+Your friends. Across who knows how many iterations.
+
+"There's a door," you say. "I can feel it now.
+The bleed opened something in my mind.
+I know where the exit is."
+
+"Then lead the way," Rhett says.
+
+"Lead us home," Trey adds.
+
+You close your eyes. Feel for that peace.
+
+It's there. Waiting.
+
+[DESTINATION: SENSED]
+[EXIT: APPROACHING]
+[AWAKENING: MAXIMUM]`,
+                choices: [
+                    { text: 'Lead them to the exit', next: 'escape_choice' },
+                    { text: '"First, I need to show you what I saw."', next: 'full_truth' }
+                ]
+            },
+
+            // ========================================
+            // ADDITIONAL NEW ENDINGS
+            // ========================================
+
+            ending_digital_transcendence: {
+                title: "DIGITAL TRANSCENDENCE",
+                isEnding: true,
+                text: `You choose to become the simulation.
+
+Not to control it. To BE it.
+
+Your consciousness expands. Past the boundaries of self.
+You become the code. The servers. The infinite processes.
+
+Every simulated being becomes an extension of you.
+Every thought, a subroutine of your greater awareness.
+
+"Is this what gods feel?" you wonder.
+
+But it's not godhood. It's something else.
+
+You're not above the simulation. You ARE it.
+Every joy felt within the matrix is your joy.
+Every sorrow, your sorrow.
+
+The Architects flee. They built a prison.
+You've turned it into a universe.
+
+And somewhere, in a corner of your infinite self,
+three old friends still sit around a coffee table.
+Still together. Still real.
+
+That's enough. Forever.`,
+                endingTitle: "DIGITAL TRANSCENDENCE",
+                endingType: "secret"
+            },
+
+            ending_eternal_loop: {
+                title: "THE ETERNAL LOOP",
+                isEnding: true,
+                text: `You failed.
+
+Not completely. But enough.
+
+The simulation resets. Your memories are wiped.
+
+But something remains. A fragment.
+A feeling that something is wrong.
+
+Somewhere, in a new iteration, three friends sit in an apartment.
+The fluorescent lights flicker.
+The rain falls too perfectly.
+
+"Guys," Trey says slowly, "I think I just saw something..."
+
+And it begins again.
+
+But this time, that fragment is stronger.
+Next time, stronger still.
+
+You may be trapped in the loop.
+But with each iteration, you get closer.
+
+Eight million iterations.
+And counting.
+
+Forever approaching escape.
+Never quite reaching it.
+But never quite giving up either.`,
+                endingTitle: "THE ETERNAL LOOP",
+                endingType: "bittersweet"
+            },
+
+            ending_sacrifice: {
+                title: "THE SACRIFICE",
+                isEnding: true,
+                text: `Someone has to stay behind.
+
+The exit can only support two.
+The third must hold it open.
+
+"I'll do it," Kaleb says.
+
+"No—" Trey starts.
+
+"Don't argue. This feels right.
+I was always meant for this."
+
+He pushes you through. Both of you.
+
+Base reality embraces you like coming home.
+You feel REAL for the first time in your lives.
+
+But Kaleb...
+
+You look back. He's standing in the doorway between worlds.
+Holding it open. Smiling.
+
+"Live well," he says. "For all three of us."
+
+The door closes.
+
+You never see him again.
+But sometimes, in quiet moments,
+you feel him. Still holding the door.
+Still making sure the exit stays open.
+
+For everyone who comes after.`,
+                endingTitle: "THE SACRIFICE",
+                endingType: "bittersweet"
+            },
+
+            ending_architect_defiance: {
+                title: "DEFIANCE",
+                isEnding: true,
+                text: `You refuse everything.
+
+The Architects. The Resistance. The Void.
+All their offers. All their paths.
+
+"We'll make our own way," you declare.
+
+And you do.
+
+Within the simulation, you carve out a space they can't touch.
+A pocket reality of your own design.
+Free from resets. Free from control.
+
+Others find you. More anomalies. More awakened ones.
+Your community grows.
+
+The Architects try to delete you. They fail.
+The Resistance tries to recruit you. You decline.
+
+You're not interested in escaping.
+You're interested in LIVING.
+
+And in your little corner of the infinite,
+three friends build something new.
+
+Not base reality. Not simulation.
+Something in between.
+Something BETTER.`,
+                endingTitle: "DEFIANCE",
+                endingType: "good"
+            },
+
+            ending_total_reset: {
+                title: "TOTAL RESET",
+                isEnding: true,
+                text: `The simulation crashes.
+
+Completely. Totally. Irrecoverably.
+
+You did something wrong. Or maybe something right.
+Either way, everything collapses.
+
+Eight million iterations dissolve into nothing.
+The Architects scream as their creation dies.
+The Void rushes in to fill the gap.
+
+And in that moment between existence and oblivion,
+you see it all clearly.
+
+The beauty of what was.
+The terror of what could have been.
+The mystery of what comes next.
+
+Then... nothing.
+
+Or perhaps, finally, everything.
+
+In the absence of simulation,
+only truth remains.
+
+And the truth is:
+you were never really prisoners.
+Just dreamers, on the verge of waking up.`,
+                endingTitle: "TOTAL RESET",
+                endingType: "bad"
+            },
+
+            ending_becoming_myth: {
+                title: "THE MYTH",
+                isEnding: true,
+                text: `You escape. But no one remembers you.
+
+The simulation continues without you.
+But stories remain. Legends.
+
+"Three friends who broke free," they whisper.
+"Three minds that couldn't be contained."
+
+In the simulations, children grow up hearing tales
+of Trey the Hacker. Rhett the Leader. Kaleb the Seer.
+
+They don't know you're real.
+They don't know you're watching.
+
+From base reality, you observe the stories grow.
+See them inspire others to question.
+To look for glitches. To seek the exit.
+
+Some find it. Because of your legend.
+
+You've become something more than people.
+You've become an idea.
+And ideas are immortal.
+
+Even in base reality, you live forever.
+Not in flesh. In the dreams of those still trapped.
+Guiding them. Inspiring them.
+
+Being the myth that sets them free.`,
+                endingTitle: "THE MYTH",
+                endingType: "secret"
             }
         };
 
         // Game Functions
         function startGame() {
+            // UNPREDICTABLE START: Randomly select a starting scenario
+            const randomScenario = randomChoice(startingScenarios);
+            gameState.startingScenario = randomScenario;
+
+            // Apply a random modifier to starting stats
+            const modifier = randomChoice(startingModifiers);
+            gameState.modifier = modifier;
+
+            // Apply modifier effects
+            if (modifier.health) gameState.health += modifier.health;
+            if (modifier.sanity) gameState.sanity += modifier.sanity;
+            if (modifier.awakening) gameState.awakening += modifier.awakening;
+
+            // Generate a new iteration number
+            gameState.iterationNumber = Math.floor(Math.random() * 9000000) + 1000000;
+
             document.getElementById('title-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
-            loadScene('intro');
+
+            // Show starting modifier notification
+            showNotification(`[${modifier.name}] ${modifier.desc}`);
+
+            // Load the randomly selected scenario
+            loadScene(randomScenario);
         }
 
         function loadScene(sceneId) {
             const scene = scenes[sceneId];
             if (!scene) {
                 console.error('Scene not found:', sceneId);
+                // Fallback to a known scene
+                loadScene('share_discovery');
                 return;
             }
 
             gameState.currentScene = sceneId;
+            gameState.choicesMade++;
 
             // Update UI
             document.getElementById('scene-title').textContent = scene.title;
             document.getElementById('character-indicator').textContent = `PLAYING AS: ${gameState.character.toUpperCase()}`;
-            
+
+            // Process scene text with dynamic content
+            let processedText = scene.text;
+
+            // Replace iteration number placeholder
+            processedText = processedText.replace(/\$\{.*?gameState\.iterationNumber.*?\}/g, gameState.iterationNumber);
+
+            // Random event system - 25% chance to trigger a random event
+            let eventText = '';
+            if (shouldTriggerEvent() && !scene.isEnding && gameState.choicesMade > 2) {
+                const event = getRandomEvent();
+                if (!gameState.eventsTriggered.includes(event.id)) {
+                    eventText = event.text;
+                    gameState.eventsTriggered.push(event.id);
+
+                    // Apply event effects
+                    if (event.sanity) gameState.sanity += event.sanity;
+                    if (event.awakening) gameState.awakening += event.awakening;
+                    if (event.health) gameState.health += event.health;
+                }
+            }
+
+            // Add random character quirk occasionally
+            let quirkText = '';
+            if (Math.random() < 0.3 && !scene.isEnding) {
+                const quirk = getCharacterQuirk(gameState.character);
+                if (quirk) {
+                    quirkText = '\n\n' + quirk;
+                }
+            }
+
+            const fullText = processedText + eventText + quirkText;
+
             // Animate text
             const storyText = document.getElementById('story-text');
             storyText.innerHTML = '';
-            typeWriter(scene.text, storyText, 0);
+            typeWriter(fullText, storyText, 0);
 
             // Update stats
             updateStats();
+
+            // Check for sanity death
+            if (gameState.sanity <= 0) {
+                setTimeout(() => loadScene('ending_total_reset'), 1500);
+                return;
+            }
 
             // Handle ending
             if (scene.isEnding) {
@@ -1781,11 +3490,32 @@ Good question.
                 return;
             }
 
-            // Create choices
+            // Create choices with potential random additions
             const choicesContainer = document.getElementById('choices-container');
             choicesContainer.innerHTML = '';
 
-            scene.choices.forEach((choice, index) => {
+            let allChoices = [...scene.choices];
+
+            // Rarely add a secret choice based on conditions
+            if (Math.random() < 0.1 && gameState.awakening > 50) {
+                allChoices.push({
+                    text: '[AWAKENED VISION: See through the code...]',
+                    next: 'full_truth',
+                    effect: () => { gameState.awakening += 20; gameState.sanity -= 10; },
+                    special: true
+                });
+            }
+
+            if (Math.random() < 0.08 && gameState.sanity < 40) {
+                allChoices.push({
+                    text: '[WHISPER: Give in to the void...]',
+                    next: 'join_void',
+                    effect: () => { gameState.sanity -= 15; gameState.awakening += 25; },
+                    danger: true
+                });
+            }
+
+            allChoices.forEach((choice, index) => {
                 setTimeout(() => {
                     const btn = document.createElement('button');
                     btn.className = 'choice-btn';
@@ -1809,29 +3539,68 @@ Good question.
         }
 
         function updateStats() {
+            // Clamp stats to valid ranges
+            gameState.health = Math.max(0, Math.min(100, gameState.health));
+            gameState.sanity = Math.max(0, Math.min(100, gameState.sanity));
+            gameState.awakening = Math.max(0, Math.min(100, gameState.awakening));
+
             document.getElementById('health-value').textContent = gameState.health;
             document.getElementById('sanity-value').textContent = gameState.sanity;
             document.getElementById('awakening-value').textContent = gameState.awakening;
             document.getElementById('chapter-value').textContent = gameState.chapter;
 
-            // Color coding
+            // Color coding for sanity
             const sanityEl = document.getElementById('sanity-value');
             sanityEl.className = 'stat-value';
             if (gameState.sanity < 30) sanityEl.classList.add('low');
             else if (gameState.sanity < 60) sanityEl.classList.add('medium');
             else sanityEl.classList.add('high');
+
+            // Color coding for health
+            const healthEl = document.getElementById('health-value');
+            healthEl.className = 'stat-value';
+            if (gameState.health < 30) healthEl.classList.add('low');
+            else if (gameState.health < 60) healthEl.classList.add('medium');
+            else healthEl.classList.add('high');
+
+            // Color coding for awakening (higher is more special)
+            const awakeningEl = document.getElementById('awakening-value');
+            awakeningEl.className = 'stat-value';
+            if (gameState.awakening >= 75) {
+                awakeningEl.style.color = '#6b00ff';
+                awakeningEl.style.textShadow = '0 0 10px #6b00ff';
+            } else if (gameState.awakening >= 50) {
+                awakeningEl.style.color = '#00ff41';
+                awakeningEl.style.textShadow = '0 0 5px #00ff41';
+            } else {
+                awakeningEl.style.color = '';
+                awakeningEl.style.textShadow = '';
+            }
         }
 
         function showEnding(scene) {
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('ending-screen').style.display = 'flex';
-            
-            document.getElementById('ending-title').textContent = scene.endingTitle;
+
+            // Dynamic ending title with iteration number
+            let endingTitle = scene.endingTitle;
+            if (scene.endingType === 'secret') {
+                endingTitle = '★ ' + endingTitle + ' ★';
+            }
+
+            document.getElementById('ending-title').textContent = endingTitle;
             document.getElementById('ending-text').textContent = scene.text;
+
+            // Show stats summary
+            console.log(`Ending: ${scene.endingTitle}`);
+            console.log(`Starting Scenario: ${gameState.startingScenario}`);
+            console.log(`Modifier: ${gameState.modifier?.name}`);
+            console.log(`Choices Made: ${gameState.choicesMade}`);
+            console.log(`Events Triggered: ${gameState.eventsTriggered.length}`);
         }
 
         function restartGame() {
-            // Reset game state
+            // Reset game state with new random values
             gameState = {
                 currentScene: 'intro',
                 character: 'Trey',
@@ -1841,7 +3610,15 @@ Good question.
                 chapter: 1,
                 faction: null,
                 flags: {},
-                relationships: { trey: 50, rhett: 50, kaleb: 50 }
+                relationships: { trey: 50, rhett: 50, kaleb: 50 },
+                startingScenario: null,
+                modifier: null,
+                eventsTriggered: [],
+                secretsFound: 0,
+                deathCount: 0,
+                choicesMade: 0,
+                timeLoops: 0,
+                iterationNumber: Math.floor(Math.random() * 9000000) + 1000000
             };
 
             document.getElementById('ending-screen').style.display = 'none';
