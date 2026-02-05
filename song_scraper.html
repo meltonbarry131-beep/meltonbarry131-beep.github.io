@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONG SCRAPER // SYSTEM ONLINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark: #003b00;
+            --neon-blue: #00d4ff;
+            --neon-pink: #ff0080;
+            --void-purple: #6b00ff;
+            --danger-red: #ff0040;
+            --warning-amber: #ffb000;
+            --bg-black: #0a0a0a;
+            --bg-dark: #111111;
+            --text-dim: #4a4a4a;
+            --border-glow: rgba(0, 255, 65, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-black);
+            color: var(--matrix-green);
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Matrix Rain Canvas */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        /* CRT Scanlines */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 20, 0, 0.6);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid var(--matrix-green);
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--matrix-green);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5), 0 0 40px rgba(0, 255, 65, 0.3);
+            letter-spacing: 4px;
+            animation: flicker 4s infinite;
+        }
+
+        .header .subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9em;
+            color: var(--text-dim);
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .header .status {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 4px 12px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--matrix-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8em;
+            color: var(--matrix-green);
+            animation: pulse 2s infinite;
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 10, 0, 0.8);
+        }
+
+        .input-section label {
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            color: var(--neon-blue);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-row input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--matrix-dark);
+            color: var(--matrix-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-row input[type="text"]:focus {
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .input-row input[type="text"]::placeholder {
+            color: var(--text-dim);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border: 1px solid var(--matrix-green);
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--matrix-green);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 65, 0.25);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn.btn-search {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .btn.btn-search:hover {
+            background: rgba(0, 212, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn.btn-danger {
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+            background: rgba(255, 0, 64, 0.1);
+        }
+
+        .btn.btn-danger:hover {
+            background: rgba(255, 0, 64, 0.25);
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.3);
+        }
+
+        /* Options Row */
+        .options-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-group label {
+            margin-bottom: 0;
+            font-size: 0.8em;
+        }
+
+        .option-group select {
+            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--matrix-dark);
+            color: var(--matrix-green);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            outline: none;
+        }
+
+        .option-group select:focus {
+            border-color: var(--matrix-green);
+        }
+
+        /* Queue */
+        .queue-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: rgba(0, 10, 20, 0.6);
+        }
+
+        .queue-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .queue-list {
+            list-style: none;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid var(--neon-blue);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .queue-item .queue-url {
+            color: var(--matrix-green);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+
+        .queue-item .queue-status {
+            font-size: 0.8em;
+            padding: 2px 8px;
+        }
+
+        .queue-item .queue-status.pending { color: var(--text-dim); }
+        .queue-item .queue-status.processing { color: var(--warning-amber); animation: pulse 1s infinite; }
+        .queue-item .queue-status.done { color: var(--matrix-green); }
+        .queue-item .queue-status.error { color: var(--danger-red); }
+
+        .queue-item .remove-btn {
+            background: none;
+            border: none;
+            color: var(--danger-red);
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .queue-item .remove-btn:hover { opacity: 1; }
+
+        /* Results */
+        .results-section {
+            margin-bottom: 30px;
+        }
+
+        .results-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1em;
+            color: var(--matrix-green);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-glow);
+        }
+
+        .song-card {
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 10, 0, 0.6);
+            margin-bottom: 15px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .song-card-header {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .song-thumbnail {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border: 1px solid var(--matrix-dark);
+            flex-shrink: 0;
+        }
+
+        .song-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-details .song-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--matrix-green);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+            margin-bottom: 5px;
+        }
+
+        .song-details .song-artist {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95em;
+            color: var(--neon-blue);
+            margin-bottom: 8px;
+        }
+
+        .song-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75em;
+            color: var(--text-dim);
+        }
+
+        .song-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .song-card-actions {
+            display: flex;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(0, 255, 65, 0.1);
+        }
+
+        .song-card-actions .btn {
+            padding: 6px 14px;
+            font-size: 0.7em;
+        }
+
+        /* Command Log */
+        .log-section {
+            padding: 20px;
+            border: 1px solid var(--border-glow);
+            background: rgba(0, 0, 0, 0.9);
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8em;
+        }
+
+        .log-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .log-entry .timestamp {
+            color: var(--text-dim);
+        }
+
+        .log-entry.info { color: var(--matrix-green); }
+        .log-entry.warn { color: var(--warning-amber); }
+        .log-entry.error { color: var(--danger-red); }
+        .log-entry.success { color: var(--neon-blue); }
+
+        /* Animations */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            96% { opacity: 0.9; }
+            97% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--matrix-dark);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--matrix-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5em; }
+            .input-row { flex-direction: column; }
+            .options-row { flex-direction: column; align-items: flex-start; }
+            .song-card-header { flex-direction: column; }
+            .song-thumbnail { width: 100%; height: 180px; }
+        }
+
+        /* Hidden utility */
+        .hidden { display: none !important; }
+
+        /* Copy command modal */
+        .command-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .command-modal-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--matrix-green);
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+        }
+
+        .command-modal-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--matrix-green);
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .command-modal-content pre {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85em;
+            color: var(--neon-blue);
+            overflow-x: auto;
+            margin-bottom: 15px;
+            border: 1px solid var(--matrix-dark);
+        }
+
+        .command-modal-content .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--danger-red);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>SONG SCRAPER</h1>
+            <div class="subtitle">// YOUTUBE AUDIO EXTRACTION SYSTEM //</div>
+            <div class="status">SYSTEM ONLINE</div>
+        </div>
+
+        <!-- URL Input -->
+        <div class="input-section">
+            <label>// ENTER YOUTUBE URL</label>
+            <div class="input-row">
+                <input type="text" id="url-input" placeholder="https://youtu.be/K7gZfLJ27oU" autocomplete="off">
+                <button class="btn" onclick="addToQueue()">ADD</button>
+            </div>
+
+            <label>// OR SEARCH BY NAME</label>
+            <div class="input-row">
+                <input type="text" id="search-input" placeholder='Search: "You Know Me"' autocomplete="off">
+                <button class="btn btn-search" onclick="searchSong()">SEARCH</button>
+            </div>
+
+            <div class="options-row">
+                <div class="option-group">
+                    <label>FORMAT:</label>
+                    <select id="format-select">
+                        <option value="mp3" selected>MP3</option>
+                        <option value="wav">WAV</option>
+                        <option value="flac">FLAC</option>
+                        <option value="aac">AAC</option>
+                        <option value="opus">OPUS</option>
+                        <option value="m4a">M4A</option>
+                        <option value="ogg">OGG</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>QUALITY:</label>
+                    <select id="quality-select">
+                        <option value="128">128 kbps</option>
+                        <option value="192" selected>192 kbps</option>
+                        <option value="256">256 kbps</option>
+                        <option value="320">320 kbps</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="processQueue()" id="process-btn">SCRAPE ALL</button>
+                <button class="btn btn-danger" onclick="clearQueue()">CLEAR</button>
+                <button class="btn btn-search" onclick="showCommand()">GET COMMAND</button>
+            </div>
+        </div>
+
+        <!-- Queue -->
+        <div class="queue-section" id="queue-section">
+            <h2>// DOWNLOAD QUEUE</h2>
+            <ul class="queue-list" id="queue-list">
+                <!-- Queue items dynamically added here -->
+            </ul>
+            <div id="queue-empty" style="color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 0.8em;">
+                No URLs in queue. Add a YouTube URL above.
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section" id="results-section">
+            <h2>// SCRAPED SONGS</h2>
+            <div id="results-list">
+                <!-- Song cards dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Command Log -->
+        <div class="log-section">
+            <h2>// SYSTEM LOG</h2>
+            <div id="log-output"></div>
+        </div>
+    </div>
+
+    <!-- Command Modal -->
+    <div class="command-modal hidden" id="command-modal">
+        <div class="command-modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h3>// TERMINAL COMMAND</h3>
+            <p style="color: var(--text-dim); font-family: 'Share Tech Mono', monospace; font-size: 0.8em; margin-bottom: 10px;">
+                Copy and paste this into your terminal to download:
+            </p>
+            <pre id="command-output"></pre>
+            <button class="btn" onclick="copyCommand()">COPY TO CLIPBOARD</button>
+        </div>
+    </div>
+
+    <script>
+        // ──────────────────────────────────────────────
+        // Matrix Rain Background
+        // ──────────────────────────────────────────────
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ♪♫♬♩';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+
+        // ──────────────────────────────────────────────
+        // State
+        // ──────────────────────────────────────────────
+        let queue = [];
+        let results = [];
+
+        // ──────────────────────────────────────────────
+        // Logging
+        // ──────────────────────────────────────────────
+        function log(message, type = 'info') {
+            const logOutput = document.getElementById('log-output');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="timestamp">[${time}]</span> ${message}`;
+            logOutput.appendChild(entry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+
+        log('Song Scraper initialized. System ready.');
+        log('Backend: Python + yt-dlp required for downloads.');
+
+        // ──────────────────────────────────────────────
+        // URL Validation
+        // ──────────────────────────────────────────────
+        function isValidYouTubeURL(url) {
+            const patterns = [
+                /^https?:\/\/(www\.)?youtube\.com\/watch\?v=[\w-]+/,
+                /^https?:\/\/youtu\.be\/[\w-]+/,
+                /^https?:\/\/(www\.)?youtube\.com\/shorts\/[\w-]+/,
+                /^https?:\/\/music\.youtube\.com\/watch\?v=[\w-]+/,
+            ];
+            return patterns.some(p => p.test(url));
+        }
+
+        function extractVideoID(url) {
+            let match = url.match(/[?&]v=([\w-]+)/);
+            if (match) return match[1];
+            match = url.match(/youtu\.be\/([\w-]+)/);
+            if (match) return match[1];
+            match = url.match(/shorts\/([\w-]+)/);
+            if (match) return match[1];
+            return null;
+        }
+
+        // ──────────────────────────────────────────────
+        // Queue Management
+        // ──────────────────────────────────────────────
+        function addToQueue() {
+            const input = document.getElementById('url-input');
+            const url = input.value.trim();
+
+            if (!url) {
+                log('No URL provided.', 'warn');
+                return;
+            }
+
+            if (!isValidYouTubeURL(url)) {
+                log(`Invalid YouTube URL: ${url}`, 'error');
+                return;
+            }
+
+            const videoId = extractVideoID(url);
+            if (queue.some(item => item.videoId === videoId)) {
+                log(`Duplicate URL skipped: ${videoId}`, 'warn');
+                return;
+            }
+
+            queue.push({
+                url: url,
+                videoId: videoId,
+                status: 'pending',
+            });
+
+            input.value = '';
+            log(`Added to queue: ${url}`, 'info');
+            renderQueue();
+        }
+
+        function removeFromQueue(index) {
+            queue.splice(index, 1);
+            renderQueue();
+            log('Removed item from queue.', 'info');
+        }
+
+        function clearQueue() {
+            queue = [];
+            renderQueue();
+            log('Queue cleared.', 'warn');
+        }
+
+        function renderQueue() {
+            const list = document.getElementById('queue-list');
+            const empty = document.getElementById('queue-empty');
+
+            if (queue.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            list.innerHTML = queue.map((item, i) => `
+                <li class="queue-item">
+                    <span class="queue-url">${item.url}</span>
+                    <span class="queue-status ${item.status}">${item.status.toUpperCase()}</span>
+                    <button class="remove-btn" onclick="removeFromQueue(${i})" title="Remove">&times;</button>
+                </li>
+            `).join('');
+        }
+
+        // ──────────────────────────────────────────────
+        // Processing (generates CLI commands)
+        // ──────────────────────────────────────────────
+        function processQueue() {
+            if (queue.length === 0) {
+                log('Queue is empty. Add URLs first.', 'warn');
+                return;
+            }
+
+            const format = document.getElementById('format-select').value;
+            const quality = document.getElementById('quality-select').value;
+
+            log(`Processing ${queue.length} song(s)...`, 'info');
+            log(`Format: ${format.toUpperCase()} | Quality: ${quality} kbps`, 'info');
+
+            // Simulate processing and generate commands
+            queue.forEach((item, i) => {
+                item.status = 'processing';
+                renderQueue();
+
+                // Use yt-dlp oEmbed endpoint for metadata (CORS-friendly)
+                fetchSongInfo(item.url, i);
+            });
+        }
+
+        async function fetchSongInfo(url, queueIndex) {
+            const videoId = extractVideoID(url);
+
+            try {
+                // Use YouTube's oEmbed API (no auth required, CORS-friendly)
+                const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+                const response = await fetch(oembedUrl);
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+
+                const songInfo = {
+                    videoId: videoId,
+                    url: url,
+                    title: data.title || 'Unknown Title',
+                    author: data.author_name || 'Unknown Artist',
+                    thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+                    provider: data.provider_name || 'YouTube',
+                };
+
+                // Parse artist - track from title
+                const parsed = parseTitle(songInfo.title, songInfo.author);
+                songInfo.artist = parsed.artist;
+                songInfo.track = parsed.track;
+
+                results.push(songInfo);
+                queue[queueIndex].status = 'done';
+                renderQueue();
+                renderResults();
+
+                log(`Scraped: ${songInfo.artist} - ${songInfo.track}`, 'success');
+            } catch (err) {
+                log(`Error fetching info for ${videoId}: ${err.message}`, 'error');
+
+                // Fallback - still add to results with basic info
+                const songInfo = {
+                    videoId: videoId,
+                    url: url,
+                    title: `Video ${videoId}`,
+                    author: 'Unknown',
+                    artist: 'Unknown Artist',
+                    track: `Video ${videoId}`,
+                    thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+                };
+
+                results.push(songInfo);
+                queue[queueIndex].status = 'done';
+                renderQueue();
+                renderResults();
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        // Title Parsing
+        // ──────────────────────────────────────────────
+        function parseTitle(title, uploader) {
+            const separators = [' - ', ' – ', ' — ', ' | ', ' // ', ' ~ '];
+            const junkPatterns = [
+                /\(official\s*(music\s*)?video\)/gi,
+                /\(official\s*audio\)/gi,
+                /\(official\s*lyric\s*video\)/gi,
+                /\(lyrics?\)/gi,
+                /\(audio\)/gi,
+                /\(visualizer\)/gi,
+                /\[official\s*(music\s*)?video\]/gi,
+                /\[official\s*audio\]/gi,
+                /\[lyrics?\]/gi,
+                /\[audio\]/gi,
+                /\bofficial\s*(music\s*)?video\b/gi,
+                /\bofficial\s*audio\b/gi,
+                /\blyric\s*video\b/gi,
+            ];
+
+            let cleaned = title;
+            junkPatterns.forEach(p => { cleaned = cleaned.replace(p, ''); });
+            cleaned = cleaned.replace(/\s+/g, ' ').trim().replace(/^[-–—|\s]+|[-–—|\s]+$/g, '');
+
+            for (const sep of separators) {
+                if (cleaned.includes(sep)) {
+                    const parts = cleaned.split(sep);
+                    const artist = parts[0].trim();
+                    const track = parts.slice(1).join(sep).trim();
+                    if (artist && track) return { artist, track };
+                }
+            }
+
+            // Fallback: uploader as artist
+            let artist = uploader || 'Unknown Artist';
+            artist = artist.replace(/\s*(VEVO|Official|Topic|Music|- Topic)$/i, '').trim();
+            return { artist, track: cleaned };
+        }
+
+        // ──────────────────────────────────────────────
+        // Search
+        // ──────────────────────────────────────────────
+        function searchSong() {
+            const input = document.getElementById('search-input');
+            const query = input.value.trim();
+
+            if (!query) {
+                log('No search query provided.', 'warn');
+                return;
+            }
+
+            log(`Search is handled via the Python CLI. Run:`, 'info');
+            log(`  python3 song_scraper.py --search "${query}"`, 'success');
+
+            // Generate the command for users
+            showSearchCommand(query);
+        }
+
+        function showSearchCommand(query) {
+            const format = document.getElementById('format-select').value;
+            const quality = document.getElementById('quality-select').value;
+
+            const cmd = `python3 song_scraper.py --search "${query}" --download --format ${format} --quality ${quality}`;
+
+            document.getElementById('command-output').textContent = cmd;
+            document.getElementById('command-modal').classList.remove('hidden');
+        }
+
+        // ──────────────────────────────────────────────
+        // Results Rendering
+        // ──────────────────────────────────────────────
+        function renderResults() {
+            const list = document.getElementById('results-list');
+
+            if (results.length === 0) {
+                list.innerHTML = '<div style="color: var(--text-dim); font-family: \'Share Tech Mono\', monospace; font-size: 0.8em;">No songs scraped yet.</div>';
+                return;
+            }
+
+            list.innerHTML = results.map((song, i) => `
+                <div class="song-card">
+                    <div class="song-card-header">
+                        <img class="song-thumbnail" src="${song.thumbnail}" alt="${song.track}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 90%22><rect fill=%22%23111%22 width=%22120%22 height=%2290%22/><text fill=%22%2300ff41%22 x=%2260%22 y=%2250%22 text-anchor=%22middle%22 font-size=%2212%22>NO THUMB</text></svg>'">
+                        <div class="song-details">
+                            <div class="song-title">${song.track}</div>
+                            <div class="song-artist">${song.artist}</div>
+                            <div class="song-meta">
+                                <span>ID: ${song.videoId}</span>
+                                <span>SRC: ${song.provider || 'YouTube'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="song-card-actions">
+                        <button class="btn" onclick="generateDownloadCmd(${i})">DOWNLOAD CMD</button>
+                        <button class="btn btn-search" onclick="window.open('${song.url}', '_blank')">OPEN VIDEO</button>
+                        <button class="btn btn-danger" onclick="removeResult(${i})">REMOVE</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeResult(index) {
+            results.splice(index, 1);
+            renderResults();
+        }
+
+        // ──────────────────────────────────────────────
+        // Command Generation
+        // ──────────────────────────────────────────────
+        function generateDownloadCmd(index) {
+            const song = results[index];
+            const format = document.getElementById('format-select').value;
+            const quality = document.getElementById('quality-select').value;
+
+            const cmd = `python3 song_scraper.py "${song.url}" --format ${format} --quality ${quality}`;
+            document.getElementById('command-output').textContent = cmd;
+            document.getElementById('command-modal').classList.remove('hidden');
+        }
+
+        function showCommand() {
+            if (queue.length === 0) {
+                log('Queue is empty. Add URLs first.', 'warn');
+                return;
+            }
+
+            const format = document.getElementById('format-select').value;
+            const quality = document.getElementById('quality-select').value;
+
+            let cmd;
+            if (queue.length === 1) {
+                cmd = `python3 song_scraper.py "${queue[0].url}" --format ${format} --quality ${quality}`;
+            } else {
+                cmd = `# Save URLs to file first:\n`;
+                queue.forEach(item => { cmd += `echo "${item.url}" >> urls.txt\n`; });
+                cmd += `\n# Then batch download:\npython3 song_scraper.py --batch urls.txt --format ${format} --quality ${quality} --export`;
+            }
+
+            document.getElementById('command-output').textContent = cmd;
+            document.getElementById('command-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('command-modal').classList.add('hidden');
+        }
+
+        function copyCommand() {
+            const cmd = document.getElementById('command-output').textContent;
+            navigator.clipboard.writeText(cmd).then(() => {
+                log('Command copied to clipboard.', 'success');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = cmd;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                log('Command copied to clipboard.', 'success');
+            });
+        }
+
+        // ──────────────────────────────────────────────
+        // Keyboard Shortcuts
+        // ──────────────────────────────────────────────
+        document.getElementById('url-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addToQueue();
+        });
+
+        document.getElementById('search-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchSong();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ──────────────────────────────────────────────
+        // Init
+        // ──────────────────────────────────────────────
+        renderQueue();
+        renderResults();
+    </script>
+</body>
+</html>

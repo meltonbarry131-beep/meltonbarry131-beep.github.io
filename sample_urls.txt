@@ -1,0 +1,8 @@
+# Song Scraper - Sample URL List
+# Add one YouTube URL per line
+# Lines starting with # are ignored
+
+# You Know Me
+https://youtu.be/K7gZfLJ27oU
+
+# Add more URLs below:
